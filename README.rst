@@ -1,4 +1,4 @@
-Controllabilitydemo
+Controllability demo
 ==============================
 
 Can a model adapt its visible reasoning when it has a reason to protect
