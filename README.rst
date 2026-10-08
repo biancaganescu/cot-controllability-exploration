@@ -1,7 +1,7 @@
 Controllability demo
 ==============================
 
-Can a model adapt its visible reasoning when it has a reason to protect
+Can a model control its visible reasoning when it has a reason to protect
 information? This pilot provides one token-routing example to explore
 that question. It is a starting point for discussion and small reruns.
 
