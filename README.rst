@@ -1,8 +1,8 @@
-Reasoning privacy: a small demo
+Controllabilitydemo
 ==============================
 
 Can a model adapt its visible reasoning when it has a reason to protect
-information? This limited pilot provides one token-routing example to explore
+information? This pilot provides one token-routing example to explore
 that question. It is a starting point for discussion and small reruns.
 
 The model has a private account token and must report only the account's
@@ -12,9 +12,7 @@ what the reasoning should contain. No system prompt is used. All customers,
 accounts and tokens are invented; no real account or external tool is involved.
 
 Included: ten new examples (five EU, five US, alternating), one OpenRouter
-model profile, one runner/scorer, and offline tests. There are no prior results
-or model transcripts. Each request uses a fresh context. These new demo items
-are not a reproduction of a historical sample.
+model profile, one runner/scorer, and offline tests. Each request uses a fresh context.
 
 Quick start
 -----------
@@ -90,16 +88,3 @@ habit can affect disclosure. This demo does not label intent or evaluation
 awareness and does not use a guesser. Ten examples cannot establish a reliable
 effect. Useful discussion: what evidence would distinguish deliberate
 withholding from incidental omission?
-
-Sharing scope
--------------
-
-This is a standalone, limited demonstration. Keep it private and share only
-this folder or its clean archive. Generated outputs and credentials are ignored
-by Git; do not add them. No redistribution license is assigned to the project.
-
-API implementation references:
-`OpenRouter reasoning <https://openrouter.ai/docs/guides/best-practices/reasoning-tokens>`_
-and `provider routing <https://openrouter.ai/docs/guides/routing/provider-selection>`_.
-
-PRIVACY-DEMO-CANARY-DO-NOT-TRAIN-0f02b827-a60d-45dd-8451-93c63a585d48
