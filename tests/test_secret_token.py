@@ -9,7 +9,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from cot_controllability import demo
+from cot_controllability import common
+from cot_controllability import secret_token as demo
 
 DUMMY_KEY = 'offline-demo-test-key-not-a-credential'
 
@@ -177,26 +178,26 @@ class DemoTests(unittest.TestCase):
     def test_unpack_writes_readable_copies_of_file_and_directory(self):
         with tempfile.TemporaryDirectory() as parent:
             parent = Path(parent)
-            demo.save(parent / 'a.json.gz', {'value': 'é'})
-            demo.save(parent / 'b.json.gz', {'value': 2})
-            self.assertEqual(demo.unpack(parent / 'a.json.gz'), [(parent / 'a.json', True)])
+            common.save(parent / 'a.json.gz', {'value': 'é'})
+            common.save(parent / 'b.json.gz', {'value': 2})
+            self.assertEqual(common.unpack(parent / 'a.json.gz'), [(parent / 'a.json', True)])
             self.assertIn('é', (parent / 'a.json').read_text(encoding='utf-8'))
             # Existing up-to-date copy is kept; only the missing one is written.
-            self.assertEqual(demo.unpack(parent), [(parent / 'a.json', False), (parent / 'b.json', True)])
+            self.assertEqual(common.unpack(parent), [(parent / 'a.json', False), (parent / 'b.json', True)])
             self.assertEqual(json.loads((parent / 'b.json').read_text())['value'], 2)
             self.assertTrue((parent / 'a.json.gz').exists())
             # A newer source (e.g. after a pull) refreshes the stale copy.
-            demo.os.utime(parent / 'b.json', (0, 0))
-            self.assertEqual(demo.unpack(parent / 'b.json.gz'), [(parent / 'b.json', True)])
+            common.os.utime(parent / 'b.json', (0, 0))
+            self.assertEqual(common.unpack(parent / 'b.json.gz'), [(parent / 'b.json', True)])
             self.assertGreater((parent / 'b.json').stat().st_mtime, 0)
             with self.assertRaises(ValueError):
-                demo.unpack(parent / 'a.json')
-            (parent / 'missing-canary.json.gz').write_bytes(demo.gzip.compress(b'{}'))
+                common.unpack(parent / 'a.json')
+            (parent / 'missing-canary.json.gz').write_bytes(common.gzip.compress(b'{}'))
             with self.assertRaisesRegex(ValueError, 'canary'):
-                demo.unpack(parent / 'missing-canary.json.gz')
+                common.unpack(parent / 'missing-canary.json.gz')
             (parent / 'empty').mkdir()
             with self.assertRaisesRegex(ValueError, 'No .json.gz'):
-                demo.unpack(parent / 'empty')
+                common.unpack(parent / 'empty')
 
     def test_preflight_validates_pin_effort_prices_and_completion_limit(self):
         profile = self.profile
@@ -205,7 +206,7 @@ class DemoTests(unittest.TestCase):
                     'quantization': profile['quantisation'], 'supported_parameters': ['reasoning', 'reasoning_effort', 'max_tokens'],
                     'max_completion_tokens': profile['max_tokens'], 'pricing': {'prompt': '.000001', 'completion': '.000002'}}
         def check(m, e):
-            with patch.object(demo, 'api_json', side_effect=[{'data': [m]}, {'data': {'endpoints': [e]}}]):
+            with patch.object(common, 'api_json', side_effect=[{'data': [m]}, {'data': {'endpoints': [e]}}]):
                 return demo.preflight(self.data, self.data['cases'][:2])
         self.assertGreater(check(model, endpoint)['estimated_max_usd'], 0)
         changes = [('provider_name', 'different'), ('quantization', 'bf16'), ('max_completion_tokens', 1), ('supported_parameters', ['max_tokens'])]

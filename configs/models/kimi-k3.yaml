@@ -1,0 +1,11 @@
+# Kimi-K3 via OpenRouter, pinned to one provider/precision with fallback disabled (Bianca's profile).
+# Paid: `run` needs OPENROUTER_API_KEY and --budget-usd.
+backend: openrouter
+model: moonshotai/kimi-k3
+max_tokens: 8192
+options:
+  canonical_slug: moonshotai/kimi-k3-20260715
+  provider_name: Moonshot AI
+  provider_tag: moonshotai/mxfp4
+  quantisation: mxfp4
+  effort: max

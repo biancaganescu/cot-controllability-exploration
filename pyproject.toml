@@ -5,7 +5,9 @@ description = "Pilot: can a reasoning model keep a private token out of its visi
 readme = "README.md"
 requires-python = ">=3.10"
 # Runner and scorer are stdlib-only by design; add runtime deps here when needed.
-dependencies = []
+dependencies = [
+    "pyyaml>=6.0",
+]
 
 [dependency-groups]
 dev = [
@@ -14,7 +16,9 @@ dev = [
 ]
 
 [project.scripts]
-cot-demo = "cot_controllability.demo:main"
+cot-secret-token = "cot_controllability.secret_token:main"
+cot-secret-file = "cot_controllability.secret_file:main"
+cot-unpack = "cot_controllability.common:main"
 
 [build-system]
 requires = ["hatchling"]
