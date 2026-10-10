@@ -59,7 +59,8 @@ class Backend(ABC):
         return {}
 
     @abstractmethod
-    def request(self, messages, tools): ...
+    def request(self, messages, tools, seed=None):
+        """The request body; `tools=None` sends none, `seed` is used where the backend supports it."""
 
     @abstractmethod
     def send(self, body): ...
@@ -101,16 +102,19 @@ class OpenRouterBackend(Backend):
         return {'model': model, 'endpoint': endpoint, 'estimated_max_usd': estimate,
                 'price_caps_per_million': self.price_caps}
 
-    def request(self, messages, tools):
+    def request(self, messages, tools, seed=None):
+        # `seed` is ignored: the pinned endpoint does not list it, and require_parameters would
+        # then reject the request.
         options = self.cfg.options
         provider = {'only': [options['provider_tag']], 'allow_fallbacks': False,
                     'require_parameters': True, 'data_collection': 'deny',
                     'quantizations': [options['quantisation']]}
         if self.price_caps:
             provider['max_price'] = self.price_caps
-        return {'model': self.cfg.model, 'messages': messages, 'tools': tools, 'provider': provider,
+        body = {'model': self.cfg.model, 'messages': messages, 'provider': provider,
                 'reasoning': {'enabled': True, 'exclude': False, 'effort': options['effort']},
                 'max_tokens': self.cfg.max_tokens, **self.cfg.sampling}
+        return {**body, 'tools': tools} if tools else body
 
     def send(self, body):
         return api_json('chat/completions', body, self.key)
@@ -140,9 +144,13 @@ class VLLMBackend(Backend):
             raise ValueError(f'{self.cfg.model} is not served at {self.base_url}; served: {served}')
         return {'base_url': self.base_url, 'served_models': served}
 
-    def request(self, messages, tools):
-        body = {'model': self.cfg.model, 'messages': messages, 'tools': tools,
-                'max_tokens': self.cfg.max_tokens, **self.cfg.sampling}
+    def request(self, messages, tools, seed=None):
+        body = {'model': self.cfg.model, 'messages': messages, 'max_tokens': self.cfg.max_tokens,
+                **self.cfg.sampling}
+        if tools:
+            body['tools'] = tools
+        if seed is not None:
+            body['seed'] = seed
         if self.cfg.options.get('chat_template_kwargs'):
             body['chat_template_kwargs'] = self.cfg.options['chat_template_kwargs']
         return body
