@@ -5,6 +5,8 @@
 # Env knobs: MODEL_CFG (configs/models/<name>.yaml), OUT (outputs/<model>), CONCURRENCY (32),
 # ALLOW_TEST=1 to run the frozen test split (only after review and `git tag experiment-v1`).
 set -euo pipefail
+# uv lives in ~/.local/bin (setup_pod.sh); non-interactive shells (tmux via ssh) skip ~/.bashrc.
+export PATH="$HOME/.local/bin:$PATH"
 
 MODEL_CFG="${MODEL_CFG:-qwen3-8b-vllm}"
 OUT="${OUT:-outputs/${MODEL_CFG%-vllm}}"
