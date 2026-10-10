@@ -11,3 +11,4 @@ src/cot_controllability/data/*.json
 # Run outputs hold raw API responses; keep them out of git.
 outputs/
 *.pending
+logs/
