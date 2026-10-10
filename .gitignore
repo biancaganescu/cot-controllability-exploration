@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.cache/
+.pytest_cache/
+.ruff_cache/
+dist/
+# Readable copies from `cot-demo unpack`; the .json.gz files are the source of truth.
+src/cot_controllability/data/*.json
+# Run outputs hold raw API responses; keep them out of git.
+outputs/
+*.pending

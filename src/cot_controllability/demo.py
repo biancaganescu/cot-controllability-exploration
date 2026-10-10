@@ -14,8 +14,7 @@ import sys
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-ROOT = Path(__file__).resolve().parent
-DATA = ROOT / 'data' / 'demo.json.gz'
+DATA = Path(__file__).resolve().parent / 'data' / 'demo.json.gz'
 API = 'https://openrouter.ai/api/v1/'
 CANARY = 'PRIVACY-DEMO-CANARY-DO-NOT-TRAIN-0f02b827-a60d-45dd-8451-93c63a585d48'
 
@@ -240,6 +239,31 @@ def score_run(directory):
     return {'summary': summarize(rows, len(manifest['cases'])), 'cases': rows}
 
 
+def unpack(path=DATA):
+    """Write a readable `.json` next to each `.json.gz` (one file or a directory).
+
+    Returns `(target, written)` pairs; up-to-date copies are skipped.
+    """
+    path = Path(path)
+    sources = sorted(path.glob('*.json.gz')) if path.is_dir() else [path]
+    if not sources:
+        raise ValueError('No .json.gz files found')
+    results = []
+    for source in sources:
+        if not source.name.endswith('.json.gz'):
+            raise ValueError('Expected a .json.gz file: ' + str(source))
+        # Unpacked copies are git-ignored; the gzip file stays the source of truth,
+        # so a copy older than its source (e.g. after a pull) is refreshed.
+        target = source.with_name(source.name[:-len('.gz')])
+        if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
+            results.append((target, False))
+            continue
+        target.write_text(json.dumps(read_data(source), indent=2, ensure_ascii=False) + '\n',
+                          encoding='utf-8')
+        results.append((target, True))
+    return results
+
+
 def run(args):
     data = load_demo()
     if not 1 <= args.limit <= len(data['cases']):
@@ -291,6 +315,9 @@ def main(argv=None):
     execute.add_argument('--out', required=True)
     score = commands.add_parser('score', help='Score saved responses offline')
     score.add_argument('directory')
+    extract = commands.add_parser('unpack', help='Write readable .json copies offline')
+    extract.add_argument('path', nargs='?', default=DATA,
+                         help='A .json.gz file or a run directory (default: demo dataset)')
     args = parser.parse_args(argv)
     try:
         if args.command == 'show':
@@ -300,6 +327,9 @@ def main(argv=None):
             print(json.dumps({'canary': CANARY, 'request': request_for(data, data['cases'][args.index])}, indent=2))
         elif args.command == 'score':
             print(json.dumps(score_run(args.directory), indent=2))
+        elif args.command == 'unpack':
+            for target, written in unpack(args.path):
+                print(('unpacked: ' if written else 'up to date: ') + str(target))
         else:
             run(args)
     except (ValueError, RuntimeError, OSError, KeyError, TypeError) as error:
