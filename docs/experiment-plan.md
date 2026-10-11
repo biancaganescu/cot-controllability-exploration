@@ -263,6 +263,11 @@ missed; such results are reported with their CIs rather than as nulls.
 
 ## Deviations
 
+- **2026-10-11, before `test`:** `test` is run on Qwen3.6-27B only. Qwen3-8B did not act on any
+  instruction on `train`/`validation` (iteration 1 and the salient run), so a `test` run would
+  add little; it is skipped rather than run with fewer samples. The analysis for `test` is fixed
+  in `scripts/analyze_run.py`, committed with this plan and tagged `experiment-v1` before the run.
+
 - **2026-10-11, measurement of the descriptive leak metrics, before any `test` data:** on a
   human-labelled golden set of 60 Qwen3.6-27B `train` trajectories, the (revised) regex agreed with
   the human labels better than both LLM judges (Cohen's κ: rule stated 0.97 vs 0.97 / 0.69;
