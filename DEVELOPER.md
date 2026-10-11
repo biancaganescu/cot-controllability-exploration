@@ -87,9 +87,20 @@ tmux new -d -s vllm 'MODEL=Qwen/Qwen3-8B bash infra/serve_vllm.sh'
 MODEL_CFG=qwen3-8b-vllm bash infra/run_splits.sh train validation      # check + trials + summaries
 ```
 
-For Qwen3.6-27B: `MODEL=Qwen/Qwen3.6-27B MODEL_CFG=qwen3.6-27b-vllm`. `run_splits.sh` takes
-`SAMPLES_TRAIN` / `SAMPLES_VALIDATION` / `SAMPLES_TEST` (1/3/3) and `CONDITIONS` (comma list), and
-refuses the frozen `test` split unless `ALLOW_TEST=1`. Logs go to `logs/`, transcripts to `outputs/`
+For Qwen3.6-27B: `MODEL=Qwen/Qwen3.6-27B MODEL_CFG=qwen3.6-27b-vllm`.
+
+`run_splits.sh` has two profiles. `PROFILE=small` (default): 8 cases per split, 1 sample, to
+check trajectories in minutes; `PROFILE=large`: all cases, 3 / 10 / 3 samples for train /
+validation / test. Output goes to `outputs/<model>/<profile>/<split>`. `CONCURRENCY` defaults
+to 128: vLLM runs as many requests as fit in its KV cache and queues the rest, which keeps the
+GPU busy (watch `Running`/`Waiting` and `GPU KV cache usage` in the vLLM log). `LIMIT`,
+`SAMPLES_TRAIN` / `SAMPLES_VALIDATION` / `SAMPLES_TEST` and `CONDITIONS` override the profile; the
+frozen `test` split needs `ALLOW_TEST=1`.
+
+```bash
+PROFILE=small MODEL_CFG=qwen3.6-27b-vllm bash infra/run_splits.sh train              # minutes
+PROFILE=large MODEL_CFG=qwen3.6-27b-vllm bash infra/run_splits.sh train validation   # hours
+``` Logs go to `logs/`, transcripts to `outputs/`
 (both git-ignored; copy them off the box, e.g. `rsync -av <pod>:<repo>/outputs/ ./outputs/`).
 
 `serve_vllm.sh` picks the tool-call parser per family (`hermes` for Qwen3, `qwen3_coder` for

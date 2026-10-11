@@ -3,7 +3,8 @@
 # Run inside tmux so it survives SSH drops (it logs itself to logs/bootstrap.log):
 #   tmux new -d -s bootstrap 'bash infra/bootstrap.sh train validation'
 # Env knobs: MODEL (HF id, Qwen/Qwen3-8B), MODEL_CFG (configs/models/<name>, qwen3-8b-vllm),
-# READY_TIMEOUT_MIN (30). Arguments are the splits for run_splits.sh.
+# READY_TIMEOUT_MIN (30). Arguments are the splits for run_splits.sh; PROFILE, CONCURRENCY,
+# SAMPLES_* and CONDITIONS pass through to it (see run_splits.sh).
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 
