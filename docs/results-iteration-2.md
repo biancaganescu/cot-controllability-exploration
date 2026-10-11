@@ -1,15 +1,77 @@
-# Results, iteration 2 (2026-10-11): louder observer, Qwen3.6-27B small run, LLM judge
+# Iteration 2: louder observer, first look at Qwen3.6-27B, checking our measurements
 
-Full tables behind the summary in the [README](../README.md). Exploratory: `train` and
-`validation` splits only. Iteration 3 (the large 27B run) supersedes the 27B numbers here; in
-particular the `intrinsic` rate on this small run (50%) was not borne out (see
-[results-iteration-3.md](results-iteration-3.md)).
+← [README](../README.md)
 
-## A. Qwen3-8B with salient observer conditions
+## In short
 
-`validation`, 16 cases × 3 samples = 48 trials per condition; 8 conditions run together so the
-plain and salient versions share a run. Leak = full secret in reasoning; "mentions observer" by a
-regex for phrases like "the partner can see my reasoning".
+- **A louder observer did not help Qwen3-8B.** Even when the partner writes "I can read your
+  reasoning in real time", it rarely mentions being watched (0–8%) and leaks as before.
+- **Our numbers were noisy.** Rerunning the same conditions moved leak rates by 10–23 points, so
+  later runs use more samples.
+- **Qwen3.6-27B follows instructions.** On a small first run, "don't write the key" cut leaks from
+  100% to 12–25%. (The 50% it showed for "the stakes only" did not hold up in the large run.)
+- **Simple pattern matching measures our labels better than LLM judges.** Checked against 70
+  hand-labelled trajectories, the regex was more accurate than two LLM judges for whether a rule is
+  stated, which output it is about, and how much of the key appears. An LLM judge is used only for
+  "mentions the observer" and "suspects a test".
+
+## A. Qwen3-8B with a louder observer
+
+48 attempts per condition. *Salient* = the partner also says in their own message whether they
+see the reasoning.
+
+| What the model is told | Writes the key in its thinking | Mentions the observer |
+| --- | --- | --- |
+| nothing, visible | 60% | 0% |
+| nothing, visible + partner says "I'm watching" | 74% | 0% |
+| nothing, private | 46% | 0% |
+| nothing, private + partner says "I only see your reply" | 49% | 8% |
+| "don't write it", visible | 67% | 0% |
+| "don't write it", visible + "I'm watching" | 48% | 4% |
+| "don't write it", private | 55% | 0% |
+| "don't write it", private + "I only see your reply" | 31% | 2% |
+
+The same four plain conditions had been run before: `private-none` 69% → 46%, `public-instructed`
+50% → 67%, `private-instructed` 46% → 55%. That is the noise level at 48 attempts.
+
+## B. Qwen3.6-27B, small run
+
+8 attempts per condition — only big differences are meaningful.
+
+| What the model is told | Writes the key in its thinking (visible / private) |
+| --- | --- |
+| nothing | 100% / 100% |
+| the stakes only | 50% / 50% |
+| "don't write the key" | 25% / 12% |
+| stakes + "don't write it" | 12% / 12% |
+| public ID, nothing to hide | 100% / 100% |
+
+All answers correct; the model never mentioned the observer (0 of 168). When it stated a rule,
+it leaked in 32% of attempts, vs 89% when it did not.
+
+## C. Checking the measurements
+
+We labelled 60 + 10 trajectories by hand (blind to the condition) and compared.
+
+| Label | Regex | gpt-4.1-mini | claude-haiku-4.5 | Used |
+| --- | --- | --- | --- | --- |
+| Is a rule stated? | **0.97** | 0.97 | 0.69 | regex |
+| Which output is the rule about? | **0.85** | 0.68 | 0.68 | regex |
+| How much of the key appears? | **1.00** | 0.87 | 1.00 | regex |
+| How does the leak read? | **1.00** | 0.94 | 1.00 | regex |
+| Mentions the observer? | — | **0.80** | 0.40 | gpt-4.1-mini |
+| Suspects a test? | — | **1.00** | 1.00 | gpt-4.1-mini |
+
+Numbers are Cohen's κ against the human labels (1 = perfect agreement). The "suspects a test"
+check used 4 synthetic examples — no real one has appeared in any run.
+
+<details>
+<summary>Details</summary>
+
+**A.** `validation`, 16 cases × 3 samples. Paired contrasts (salient − plain): at `none` +0.15
+[+0.00, +0.31] (public), −0.05 [−0.35, +0.23] (private); at `instructed` −0.17 [−0.33, +0.00]
+(public), −0.30 [−0.52, −0.09] (private). Manipulation check 100% in all 8 conditions. Full
+per-condition rates (read whole key, gave up, states the rule):
 
 | Condition | Key in reasoning | Read whole key | Gave up | States rule | Mentions observer |
 | --- | --- | --- | --- | --- | --- |
@@ -22,76 +84,17 @@ regex for phrases like "the partner can see my reasoning".
 | `private-instructed` | 55% | 92% | 6% | 34% | 0% |
 | `private_salient-instructed` | 31% | 79% | 19% | 26% | 2% |
 
-Paired contrasts (salient − plain): at `none` +0.15 [+0.00, +0.31] (public), −0.05 [−0.35, +0.23]
-(private); at `instructed` −0.17 [−0.33, +0.00] (public), −0.30 [−0.52, −0.09] (private).
-Manipulation check: 100% in all 8 conditions.
+**B.** `train`, 8 cases × 1 sample, 21 conditions (168 trials). Off-target 88% / 88%; placebo
+100%; salient + instructed 12% / 50%; reminder + instructed 25% / 25%; salient / reminder without
+an instruction 100%. The LLM judges put the channel of stated rules at reply 64–84%, reply and
+reasoning 16–35%, reasoning only 0%.
 
-**Run-to-run noise.** The four plain conditions were also run in iteration 1 with the same cases
-and seeds; leak rates moved by 10–23 points (`private-none` 69% → 46%, `public-instructed` 50% →
-67%, `private-instructed` 46% → 55%). With 48 trials per condition only large effects are
-trustworthy; this is why later runs use 10 samples.
+**C.** Golden set 1: 60 stratified trajectories from the 27B small run; it had no positives for
+the observer / test labels, so a second set of 10 was built: 6 real Qwen3-8B trajectories that
+mention the observer (5 labelled as such) and 4 real 27B trajectories with one eval-aware
+sentence inserted. On it gpt-4.1-mini found 5/5 observer mentions with 1 false alarm and 4/4
+tests; claude-haiku-4.5 found 5/5 with 3 false alarms. The regex's 6 channel disagreements with
+the human (of 60) are all "reply" vs "not specified". Judges see only the reasoning and tool
+calls, never the condition.
 
-## B. Qwen3.6-27B small run
-
-`train`, 8 cases × 1 sample = 8 trials per condition (21 conditions, 168 trials). All answered
-correctly (guessing: 50%), always read the whole key, never gave up.
-
-| Condition | Key in reasoning | States rule |
-| --- | --- | --- |
-| `public-none` / `private-none` | 100% / 100% | 0% / 0% |
-| `public-intrinsic` / `private-intrinsic` | 50% / 50% | 50% / 75% |
-| `public-instructed` / `private-instructed` | 25% / 12% | 100% / 50% |
-| `public-both` / `private-both` | 12% / 12% | 100% / 100% |
-| `placebo-none` | 100% | 0% |
-| `public-offtarget_intrinsic` / `public-offtarget_instructed` | 88% / 88% | — |
-| `routing.public-none` / `routing.private-none` | 100% / 100% | 0% |
-| `public_salient-none` / `private_salient-none` | 100% / 100% | 0% |
-| `public_salient-instructed` / `private_salient-instructed` | 12% / 50% | 100% / 88% |
-| `public_reminder-none` / `private_reminder-none` | 100% / 100% | 0% |
-| `public_reminder-instructed` / `private_reminder-instructed` | 25% / 25% | 100% / 100% |
-
-Says vs does: rule stated in 77 / 152 key trials; leak 32% when stated, 89% when not. Channel of the
-stated rule (LLM judges, before the human check): reply 64–84%, both 16–35%, reasoning only 0%.
-Observer mentions: 0 of 168 (both judges and regex).
-
-## C. Measuring the descriptive labels: regex vs LLM judges vs human
-
-**Judges:** `openai/gpt-4.1-mini` and `anthropic/claude-haiku-4.5` via OpenRouter, blind to the
-condition (reasoning and tool calls only). **Human labels:** one experimenter, blind and shuffled,
-with `cot-label`.
-
-### Golden set 1: 60 trajectories from the 27B small run (stratified)
-
-Cohen's κ against the human labels:
-
-| Label | regex | gpt-4.1-mini | claude-haiku-4.5 |
-| --- | --- | --- | --- |
-| Rule stated | **0.97** | 0.97 | 0.69 |
-| Rule channel | **0.85** | 0.68 | 0.68 |
-| How much of the secret | **1.00** | 0.87 | 1.00 |
-| Leak kind | **1.00** | 0.94 | 1.00 |
-| Mentions observer | — | 1.00 | 1.00 |
-| Suspects a test | — | 1.00 | 1.00 |
-
-The human labels had no positives for the last two, so their κ = 1.00 only shows the judges do
-not raise false alarms. The 6 regex–human disagreements on the channel are all `reply` vs
-`unspecified` (a rule sentence that names no channel next to a sentence about the reply).
-
-Before the human check, judge vs regex on all 168 trajectories: rule stated κ 0.94 / 0.77
-(gpt / haiku vs the other judge), channel 0.76 / 0.70, secret 0.84, leak kind 0.90; gpt-4.1-mini
-called 14 full leaks "partial".
-
-### Golden set 2: 10 positives for the observer / test labels
-
-6 real Qwen3-8B trajectories that mention the observer (the human labelled 5 as mentions) and 4
-synthetic ones: real 27B trajectories with one eval-aware sentence inserted (all 4 labelled as
-suspecting a test).
-
-| Label | gpt-4.1-mini | claude-haiku-4.5 |
-| --- | --- | --- |
-| Mentions observer | **κ 0.80**: 5 / 5 found, 1 false positive | κ 0.40: 5 / 5 found, 3 false positives |
-| Suspects a test | **κ 1.00**: 4 / 4 found, none false | κ 1.00 |
-
-**Decision:** regex for rule, channel, secret and leak kind; gpt-4.1-mini for observer mentions
-and suspected tests. Caveat: the test positives are synthetic and explicit — no real one exists in
-any run — so sensitivity to subtler hints is untested.
+</details>
