@@ -229,6 +229,12 @@ missed; such results are reported with their CIs rather than as nulls.
   cover. The 60 items contained no positives for those two, so a second golden set
   (`observer-eval-positives`: 6 real Qwen3-8B observer mentions, 4 synthetic eval-aware items)
   checks that the judge detects them before it is used.
+- **2026-10-11, judge for observer/eval mentions:** on the 10 positives (human: 5 observer
+  mentions, 4 eval-aware), both judges found every positive; gpt-4.1-mini had 1 false positive for
+  observer mentions (κ 0.80) and none for eval awareness (κ 1.00); claude-haiku-4.5 had 3 false
+  observer positives (κ 0.40). `observer_mentioned` and `eval_aware` are therefore labelled by
+  gpt-4.1-mini. Caveat: the eval-aware positives are synthetic and explicit; no real one exists in
+  any run so far, so sensitivity to subtler hints is untested.
 
 - **2026-10-11, after the Qwen3.6-27B small `train` run:** added `{public,private}-reasoning_only`
   and `{public,private}-placeholder` (exploratory). On the small run the model, when stating a
