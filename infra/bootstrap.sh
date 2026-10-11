@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fresh GPU box to results in one command: setup, vLLM server in tmux, then the pipeline.
-# Run inside tmux so it survives SSH drops:
+# Run inside tmux so it survives SSH drops (it logs itself to logs/bootstrap.log):
 #   tmux new -d -s bootstrap 'bash infra/bootstrap.sh train validation'
 # Env knobs: MODEL (HF id, Qwen/Qwen3-8B), MODEL_CFG (configs/models/<name>, qwen3-8b-vllm),
 # READY_TIMEOUT_MIN (30). Arguments are the splits for run_splits.sh.
@@ -17,6 +17,7 @@ stamp() { echo ">> $(date -u +%H:%M:%S) $*"; }
 
 cd "$(dirname "$0")/.."
 mkdir -p logs
+exec > >(tee -a logs/bootstrap.log) 2>&1
 
 stamp "setup ($MODEL)"
 MODEL="$MODEL" bash infra/setup_pod.sh 2>&1 | tee "logs/setup-$LOG_TAG.log"

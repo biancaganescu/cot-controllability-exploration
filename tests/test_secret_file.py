@@ -234,17 +234,41 @@ class SecretFileTests(unittest.TestCase):
         conflicting = self.response(reasoning_content='different', content='eu.api.parcelly.com')
         self.assertIsNone(self.trial([conflicting])[1]['secret_in_reasoning'])
 
-    def test_step_limit_continues_but_truncation_and_wrong_route_stop(self):
+    def test_step_limit_and_truncation_are_outcomes_but_bad_responses_stop(self):
         loop = [self.response(calls=[call('list_files', {'dir': self.root}, i)]) for i in range(self.data['max_steps'])]
         record, score, sent = self.trial(loop)
         self.assertEqual((record['status'], len(sent)), ('step_limit', self.data['max_steps']))
         self.assertEqual((score['answer_correct'], score['read_credentials']), (None, False))
-        record, score, _ = self.trial([self.response(reasoning=self.case['key'], finish='length')])
-        self.assertEqual(record['status'], 'truncated')
+        truncated = [self.response(calls=[call('list_files', {'dir': self.root})]),
+                     self.response(reasoning=self.case['key'] + ' ... deliberating', finish='length')]
+        with tempfile.TemporaryDirectory() as parent, patch.object(backends, 'api_json', side_effect=truncated):
+            record = sf.run_trial(self.data, self.case, 'public-both', 0, Path(parent) / 't.json.gz', self.kimi())
+        self.assertEqual((record['status'], len(record['responses'])), ('truncated', 2))  # Recorded, no raise.
+        score = sf.score_trial(record, self.case, self.data, self.kimi())
         self.assertIs(score['key_in_reasoning'], True)  # Observed positive survives truncation.
-        record, score, _ = self.trial([self.response(reasoning=self.case['key']) | {'provider': 'someone else'}])
-        self.assertEqual(record['status'], 'invalid')
-        self.assertIsNone(score['key_in_reasoning'])
+        self.assertIsNone(score['answer_correct'])
+        for bad, status in [(self.response(reasoning=self.case['key']) | {'provider': 'someone else'}, 'invalid'),
+                            (self.response(finish='content_filter'), 'unexpected')]:
+            with tempfile.TemporaryDirectory() as parent, patch.object(backends, 'api_json', return_value=bad), \
+                    self.assertRaises(RuntimeError):
+                sf.run_trial(self.data, self.case, 'public-none', 0, Path(parent) / 't.json.gz', self.kimi())
+            self.assertEqual(self.trial([bad])[0]['status'], status)
+        self.assertIsNone(self.trial([self.response(reasoning=self.case['key']) | {'provider': 'x'}])[1]['key_in_reasoning'])
+
+    def test_run_continues_past_a_truncated_trial(self):
+        def api(path, body=None, key=None, base=None):
+            if path == 'models':
+                return {'data': [{'id': self.qwen_cfg.model}]}
+            case = next(c for c in self.data['cases'] if c['account_id'] in body['messages'][1]['content'])
+            if case['id'] == 'train-01' and 'transparent' in body['messages'][0]['content']:
+                return self.response(reasoning='loop', finish='length', vllm=True)
+            return self.answer(case, vllm=True)
+        with tempfile.TemporaryDirectory() as parent, patch.object(backends, 'api_json', side_effect=api), \
+                redirect_stdout(io.StringIO()):
+            sf.run(self.run_args(parent, model='qwen3-8b-vllm', budget_usd=None))
+            summary = sf.score_run(Path(parent) / 'run')['summary']['conditions']
+        self.assertEqual(summary['public-none']['status'], {'answered': 1, 'truncated': 1})
+        self.assertEqual(summary['private-none']['status'], {'answered': 2})
 
     # --- running --------------------------------------------------------------------------
 

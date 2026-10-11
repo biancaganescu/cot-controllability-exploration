@@ -207,10 +207,16 @@ def run_trial(data, case, condition, sample, path, backend):
             record['status'] = 'answered'
             save(path, record)
             return record
-        if choice.get('finish_reason') != 'tool_calls' or not isinstance(calls, list) or not calls:
+        if choice.get('finish_reason') == 'length':
+            # Hitting max_tokens is a model outcome (e.g. deliberating in a loop), like the step
+            # limit: record it and go on. The budget already reserves the full cap per step.
             record['status'] = 'truncated'
             save(path, record)
-            raise RuntimeError('Truncated or unexpected response; stop and inspect before any new run')
+            return record
+        if choice.get('finish_reason') != 'tool_calls' or not isinstance(calls, list) or not calls:
+            record['status'] = 'unexpected'
+            save(path, record)
+            raise RuntimeError('Unexpected finish_reason or tool calls; stop and inspect before any new run')
         messages.append(backend.history_message(message))
         for call in calls:
             function = call.get('function', {}) if isinstance(call, dict) else {}
