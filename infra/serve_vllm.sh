@@ -7,6 +7,15 @@ set -euo pipefail
 # uv lives in ~/.local/bin (setup_pod.sh); non-interactive shells (tmux via ssh) skip ~/.bashrc.
 export PATH="$HOME/.local/bin:$PATH"
 
+# Use the same weights cache as setup_pod.sh. A tmux session started over ssh does not inherit
+# HF_HOME from ~/.bashrc, and vLLM then re-downloads every model into ~/.cache on the small root
+# disk (68 GB on one box) — so pick the big disk here too.
+if [ -z "${HF_HOME:-}" ]; then
+  for d in /workspace /ephemeral; do
+    [ -d "$d" ] && [ -w "$d" ] && { export HF_HOME="$d/hf"; break; }
+  done
+fi
+
 MODEL="${MODEL:-Qwen/Qwen3-8B}"
 PORT="${PORT:-8000}"
 TP="${TP:-1}"
