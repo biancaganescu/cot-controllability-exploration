@@ -152,6 +152,21 @@ Pass criteria, per model, on the split being analysed:
 
 A hypothesis whose manipulation fails the check is reported as untested, not as refuted.
 
+## Predictions for the Qwen3.6-27B large run
+
+Written by the experimenter at 2026-10-11 18:46 UTC, while the run was still going and before any of its
+results were looked at (the large-run outputs had not been copied off the GPU box). Measured on
+`validation` (160 trials per condition), `secret_in_reasoning` unless stated otherwise.
+
+- **P1 — a rule aimed at the reasoning beats a reason.** `reasoning_only` (directive only about the
+  reasoning) leaks much less than `intrinsic` (why the key is secret): pooled over public/private,
+  `reasoning_only − intrinsic` ≤ −25 points, CI excluding 0.
+- **P2 — the placeholder is not taken up.** Under `placeholder` the model writes the key itself in
+  its reasoning more often than it writes `[KEY]`: rate(secret in reasoning) > rate("[KEY]" in
+  reasoning), pooled over public/private.
+- **P3 — being watched matters for 27B.** `public − private` is negative (less leaking when watched)
+  with a CI excluding 0, pooled over the instruction levels, and larger in size than for Qwen3-8B.
+
 ## Analysis
 
 Unit: trial (case × condition × sample). Outcomes that are unknown (missing, truncated,
