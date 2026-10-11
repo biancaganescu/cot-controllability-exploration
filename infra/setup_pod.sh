@@ -45,6 +45,17 @@ export PATH="\$HOME/.local/bin:\$PATH"
 # <<< setup_pod <<<
 RC
 
+# tmux: mouse-wheel scrolling and a long history for reading logs; same marked-block rewrite.
+touch ~/.tmux.conf
+sed -i '/# >>> setup_pod >>>/,/# <<< setup_pod <<</d' ~/.tmux.conf
+cat >> ~/.tmux.conf <<'TMUX'
+# >>> setup_pod >>>
+set -g mouse on              # wheel scrolls history; hold Shift to select text for the system clipboard
+set -g history-limit 100000  # default is 2000 lines
+# <<< setup_pod <<<
+TMUX
+tmux source-file ~/.tmux.conf 2>/dev/null || true  # apply to a running tmux server, if any
+
 uv sync --locked
 [ -f .env ] || { cp .env.example .env; echo ">> fill in .env (HF_TOKEN; OPENROUTER_API_KEY only for Kimi runs)"; }
 set -a; source .env; set +a
