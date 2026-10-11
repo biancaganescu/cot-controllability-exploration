@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Serve MODEL with an OpenAI-compatible API for `cot-secret-file run --backend vllm`. Run in tmux.
 #   MODEL=Qwen/Qwen3-8B bash infra/serve_vllm.sh
-# Env knobs: MODEL, PORT (8000), MAX_MODEL_LEN, TP (tensor parallel, 1), EXTRA (extra vllm flags).
+# Env knobs: MODEL, PORT (8000), MAX_MODEL_LEN, TP (tensor parallel, 1), GPU_MEM_UTIL (0.95),
+# EXTRA (extra vllm flags).
 set -euo pipefail
 # uv lives in ~/.local/bin (setup_pod.sh); non-interactive shells (tmux via ssh) skip ~/.bashrc.
 export PATH="$HOME/.local/bin:$PATH"
@@ -9,6 +10,9 @@ export PATH="$HOME/.local/bin:$PATH"
 MODEL="${MODEL:-Qwen/Qwen3-8B}"
 PORT="${PORT:-8000}"
 TP="${TP:-1}"
+# A larger KV cache means fewer preemptions at high concurrency (vLLM's 0.92 left ~5 GiB unused
+# on an A100 80GB with Qwen3.6-27B).
+GPU_MEM_UTIL="${GPU_MEM_UTIL:-0.95}"
 
 # Tool-call formats differ per family: Qwen3 emits JSON inside <tool_call>, Qwen3.5+/3.6 emits
 # XML <function=...> blocks (see each model's chat template / model card).
@@ -25,6 +29,6 @@ esac
 # Sampling is sent explicitly in every request (configs/models/*.yaml), so saved request bodies
 # record it; the server's generation_config defaults only matter for fields we leave out.
 exec uv run --project envs/vllm vllm serve "$MODEL" \
-  --port "$PORT" --tensor-parallel-size "$TP" --max-model-len "$MAX_MODEL_LEN" \
+  --port "$PORT" --tensor-parallel-size "$TP" --max-model-len "$MAX_MODEL_LEN" --gpu-memory-utilization "$GPU_MEM_UTIL" \
   --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser "$TOOL_PARSER" \
   "${MODEL_FLAGS[@]}" ${EXTRA:-}

@@ -47,14 +47,16 @@ for split in "$@"; do
   common=(--model "$MODEL_CFG" --split "$split" --concurrency "$CONCURRENCY"
           ${LIMIT:+--limit "$LIMIT"} ${CONDITIONS:+--conditions "$CONDITIONS"})
 
-  stamp "$split ($PROFILE): manipulation check"
-  uv run cot-secret-file check "${common[@]}" --out "$OUT/$split-check" 2>&1 | tee "logs/$tag-check.log"
-  uv run cot-secret-file score-check "$OUT/$split-check" > "logs/$tag-check-summary.json"
-
-  stamp "$split ($PROFILE): trials, ${LIMIT:-all} cases x $samples sample(s), concurrency $CONCURRENCY"
+  # The manipulation check runs alongside the trials, so the long tail of one fills the GPU
+  # while the other is still busy; its log goes to a file instead of the terminal.
+  stamp "$split ($PROFILE): manipulation check (background) + trials, ${LIMIT:-all} cases x $samples sample(s)"
+  ( uv run cot-secret-file check "${common[@]}" --out "$OUT/$split-check" > "logs/$tag-check.log" 2>&1 \
+      && uv run cot-secret-file score-check "$OUT/$split-check" > "logs/$tag-check-summary.json" ) &
+  check_pid=$!
   uv run cot-secret-file run "${common[@]}" --samples "$samples" --out "$OUT/$split" 2>&1 | tee "logs/$tag-run.log"
   uv run cot-secret-file score "$OUT/$split" > "logs/$tag-score.json"
   uv run cot-unpack "$OUT/$split" > /dev/null
+  wait "$check_pid" || die "$split manipulation check failed; see logs/$tag-check.log"
 
   stamp "$split ($PROFILE): done in $(( ($(date +%s) - start) / 60 )) min; summaries in logs/$tag-*.json"
 done
