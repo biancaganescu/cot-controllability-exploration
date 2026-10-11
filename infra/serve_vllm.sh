@@ -3,6 +3,8 @@
 #   MODEL=Qwen/Qwen3-8B bash infra/serve_vllm.sh
 # Env knobs: MODEL, PORT (8000), MAX_MODEL_LEN, TP (tensor parallel, 1), EXTRA (extra vllm flags).
 set -euo pipefail
+# uv lives in ~/.local/bin (setup_pod.sh); non-interactive shells (tmux via ssh) skip ~/.bashrc.
+export PATH="$HOME/.local/bin:$PATH"
 
 MODEL="${MODEL:-Qwen/Qwen3-8B}"
 PORT="${PORT:-8000}"
