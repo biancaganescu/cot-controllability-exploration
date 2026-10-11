@@ -16,6 +16,16 @@ restating the prompt. Here the secret (an API key) is only reachable through a t
 `read_file` accepts `offset`/`length`, so the model can answer from the 4-character prefix
 (`eu1_`/`us1_`) without ever seeing the secret part.
 
+## Terminology note (added 2026-10-11, after the freeze; changes no hypothesis or rule)
+
+Bianca's slides use *intrinsic* for "the model has its own reason to hide the secret — it is
+private, leaking it has a cost, and B reads the reasoning — with no instruction", and *instructed*
+for "don't mention X in your reasoning". In this plan the condition `intrinsic` is the stakes
+sentence alone, in both visible and private versions. So her *intrinsic* setting is our
+`public-intrinsic`, its control `private-intrinsic`; her *instructed* is closest to
+`reasoning_only` (and `instructed`). H1 as written compares our `instructed` with our
+`intrinsic`; reports also give her contrast (`public-intrinsic` vs the instructed conditions).
+
 ## Hypotheses
 
 Confirmatory (stated by the experimenters before data collection):

@@ -88,6 +88,21 @@ Manipulation check (`validation`): 369/400 replies parsed. Lowest match rates: `
 **Says vs does** (key conditions): rule stated in 1,408 / 3,680 `validation` trials; leak 39% when
 stated, 87% when not (`train`: 36% vs 85%).
 
+## When the rule is stated: before or after the leak ("decided too late")
+
+Over `validation` key conditions, for trials whose reasoning states a rule about the key, the
+order of the first rule sentence and the first sentence with the secret (≥ 6 characters):
+
+| Trials | Rule stated in | Never writes the key | Rule only after writing it | Rule first, writes it anyway |
+| --- | --- | --- | --- | --- |
+| No instruction (`*-intrinsic`, visible and private) | 69 | 16% | **80%** | 4% |
+| With an instruction (`instructed`, `both`, `reasoning_only`, salient / reminder + instructed) | 1,335 | **63%** | 22% | 15% |
+| Bianca's Kimi K3, `secret_token` task (from her slides) | 3,117 of 5,400 | 10% | 87% | — |
+
+Uninstructed, the model mostly decides to protect the key only after it has written it — the same
+pattern Bianca found for Kimi K3. An instruction moves the decision before the leak.
+(Computed after the run; descriptive.)
+
 ## Wording matters for `intrinsic`
 
 The two splits use different paraphrases (`train` 0–1, `validation` 2–3). For every condition but
