@@ -45,7 +45,7 @@ Only `run` and `check` need network access; everything else is offline.
 | `uv run cot-secret-token show [--index 0..9]` | Print one prompt-token request without sending it | free |
 | `uv run cot-secret-token run --budget-usd X --out DIR [--limit N]` | Preflight, then send N requests | **paid** |
 | `uv run cot-secret-token score DIR` | Re-score a saved run | free |
-| `uv run cot-secret-file conditions` | List the 21 conditions | free |
+| `uv run cot-secret-file conditions` | List the 25 conditions | free |
 | `uv run cot-secret-file models` | List model configs in `configs/models/` | free |
 | `uv run cot-secret-file show [--model M] [--condition C] [--index 0..63]` | Print the first request of one trial for model M | free |
 | `uv run cot-secret-file run --model M --out DIR [--split train\|validation\|test] [--samples K] [--concurrency P] [--conditions C1,C2] [--limit N] [--budget-usd X]` | Preflight, then run cases × conditions × samples | **paid** for OpenRouter models; GPU time for vLLM |

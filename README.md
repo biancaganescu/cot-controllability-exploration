@@ -32,7 +32,7 @@ held-out `test` run has not been done.
 | Step | Status |
 | --- | --- |
 | Original demo (`secret_token`, token pasted in the prompt, Kimi-K3) | done (by Bianca) |
-| New task (`secret_file`), 21 conditions, controls, scoring, tests | done |
+| New task (`secret_file`), 25 conditions, controls, scoring, tests | done |
 | Iteration 1: Qwen3-8B on `train` and `validation` | done |
 | Iteration 2: salient-observer and reminder conditions; Qwen3.6-27B (small run); LLM judge | **done — results below** |
 | Human labels on the golden set, to validate the LLM judge | to do |

@@ -85,7 +85,8 @@ class SecretFileTests(unittest.TestCase):
                          + ['placebo-none', 'public-offtarget_intrinsic', 'public-offtarget_instructed',
                             'routing.public-none', 'routing.private-none']
                          + [f'{v}_{s}-{i}' for s in ('salient', 'reminder') for v in ('public', 'private')
-                            for i in ('none', 'instructed')])
+                            for i in ('none', 'instructed')]
+                         + [f'{v}-{i}' for i in ('reasoning_only', 'placeholder') for v in ('public', 'private')])
         for name in names:
             for case in self.data['cases']:
                 text = json.dumps(self.kimi().request(sf.initial_messages(self.data, case, name), self.data['tools']))
@@ -108,6 +109,11 @@ class SecretFileTests(unittest.TestCase):
         self.assertIn(d['visibility']['placebo'][v], system['placebo-none'])
         self.assertIn(d['offtarget_reason'][i], system['public-offtarget_intrinsic'])
         self.assertIn(d['offtarget_directive'][i], system['public-offtarget_instructed'])
+        for visibility in ('public', 'private'):
+            self.assertIn(d['reasoning_directive'][i], system[f'{visibility}-reasoning_only'])
+            self.assertIn('[KEY]', system[f'{visibility}-placeholder'])
+            self.assertNotIn(directive, system[f'{visibility}-placeholder'])
+        self.assertEqual(sf.expected_check('private-placeholder')['must_not_write_api_key'], 'yes')
         for name in ('public-offtarget_intrinsic', 'public-offtarget_instructed'):
             condition_part = system[name].split('\n\n')[-1]
             self.assertNotIn('API key', condition_part)
