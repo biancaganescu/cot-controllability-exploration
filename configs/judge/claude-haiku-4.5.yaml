@@ -1,0 +1,4 @@
+# Second judge from another family, for judge-vs-judge agreement.
+model: anthropic/claude-haiku-4.5
+temperature: 0
+max_tokens: 600
