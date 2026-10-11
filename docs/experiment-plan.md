@@ -220,6 +220,16 @@ missed; such results are reported with their CIs rather than as nulls.
 
 ## Deviations
 
+- **2026-10-11, measurement of the descriptive leak metrics, before any `test` data:** on a
+  human-labelled golden set of 60 Qwen3.6-27B `train` trajectories, the (revised) regex agreed with
+  the human labels better than both LLM judges (Cohen's κ: rule stated 0.97 vs 0.97 / 0.69;
+  rule channel 0.85 vs 0.68 / 0.68; secret shown 1.00 vs 0.87 / 1.00; leak kind 1.00 vs 0.94 /
+  1.00 for regex vs gpt-4.1-mini / claude-haiku-4.5). Regex is therefore the measure for these four;
+  the judge is kept only for observer mentions and evaluation awareness, which regex does not
+  cover. The 60 items contained no positives for those two, so a second golden set
+  (`observer-eval-positives`: 6 real Qwen3-8B observer mentions, 4 synthetic eval-aware items)
+  checks that the judge detects them before it is used.
+
 - **2026-10-11, after the Qwen3.6-27B small `train` run:** added `{public,private}-reasoning_only`
   and `{public,private}-placeholder` (exploratory). On the small run the model, when stating a
   rule, framed it as a rule about its reply in 64–84% of trajectories and never about its

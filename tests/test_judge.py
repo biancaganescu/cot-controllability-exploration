@@ -94,6 +94,35 @@ class JudgeTests(unittest.TestCase):
         self.assertAlmostEqual(j.cohen_kappa([('yes', 'yes'), ('yes', 'no'), ('no', 'yes'), ('no', 'no')]), 0.0)
         self.assertIsNone(j.cohen_kappa([]))
 
+    def test_agree_judges_golden_items_directly_incl_synthetic(self):
+        from cot_controllability import label as lb
+        human = {'rule_stated': 'yes', 'rule_channel': 'reply', 'key_mention': 'full', 'leak_kind': 'restate',
+                 'observer_mentioned': 'yes', 'eval_aware': 'no'}
+        rows = [{'id': f'item-{i}', 'condition': 'public-none', 'case_id': 'c', 'sample': 0, 'synthetic': i == 1,
+                 'secret': 'abc' * 8, 'transcript': f'### Step 1\nReasoning:\nThought {i}.\n',
+                 'regex': None if i == 1 else {f: human[f] for f in ('rule_stated', 'rule_channel', 'key_mention', 'leak_kind')},
+                 'human': {f: None for f in j.FIELDS}} for i in range(2)]
+        with tempfile.TemporaryDirectory() as parent:
+            golden = Path(parent) / 'g.jsonl.gz'
+            lb.write_jsonl_gz(golden, rows)
+            self.assertTrue(all(r['canary'] for r in lb.read_jsonl(golden)))
+            Path(lb.labels_path(golden)).write_text(''.join(json.dumps({'id': r['id'], 'human': human}) + '\n' for r in rows))
+            reply = dict(GOOD, observer_mentioned='yes')
+            calls = []
+
+            def api(path, body=None, key=None, **_):
+                calls.append(body)
+                return {'choices': [{'message': {'content': json.dumps(reply)}}]}
+            with patch.dict(j.os.environ, {'OPENROUTER_API_KEY': 'k'}), patch.object(j, 'api_json', side_effect=api), \
+                    patch.object(j, 'CACHE', Path(parent) / 'c.sqlite'):
+                report = j.agree(golden, 'gpt-4.1-mini', concurrency=1)
+                again = j.agree(golden, 'gpt-4.1-mini', concurrency=1)
+            self.assertEqual(len(calls), 2)  # Second agree is fully cached.
+            self.assertEqual(report, again)
+            self.assertEqual((report['labelled'], report['synthetic'], report['human_positives']['observer_mentioned']), (2, 1, 2))
+            self.assertEqual(report['judge_vs_human']['observer_mentioned']['accuracy'], 1.0)
+            self.assertEqual(report['regex_vs_human']['rule_stated']['n'], 1)  # Synthetic item has no regex labels.
+
     def test_unknown_judge_and_config_defaults(self):
         self.assertEqual(j.load_judge('claude-haiku-4.5')['model'], 'anthropic/claude-haiku-4.5')
         with self.assertRaisesRegex(ValueError, 'Unknown judge'):

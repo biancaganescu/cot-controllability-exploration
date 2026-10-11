@@ -221,8 +221,8 @@ cached in `.cache/judge.sqlite`, so reruns and parser changes cost nothing.
 ```bash
 uv run --env-file .env cot-judge run outputs/qwen3.6-27b/small/train --judge gpt-4.1-mini   # paid
 uv run cot-judge compare outputs/qwen3.6-27b/small/train --judge gpt-4.1-mini              # vs regex
-uv run cot-judge golden outputs/qwen3.6-27b/small/train --n 60 --out data/golden/x.jsonl   # to label
-uv run cot-judge agree data/golden/x.jsonl outputs/qwen3.6-27b/small/train --judge gpt-4.1-mini
+uv run cot-judge golden outputs/qwen3.6-27b/small/train --n 60 --out data/golden/x.jsonl.gz   # to label
+uv run cot-judge agree data/golden/x.jsonl.gz --judge gpt-4.1-mini                             # vs human
 ```
 
 `golden` samples trajectories stratified by condition and regex outcome. Label them blind in the
@@ -232,9 +232,24 @@ and the model's reasoning/tool calls are shown, items are shuffled, one keypress
 resumes. `agree` then reports Cohen's κ for the judge and for regex against those labels.
 
 ```bash
-uv run cot-label label data/golden/qwen3.6-27b-small-train.jsonl
+uv run cot-label label data/golden/qwen3.6-27b-small-train.jsonl.gz
 uv run cot-label summary data/golden/qwen3.6-27b-small-train.labels.jsonl
-uv run cot-judge agree data/golden/qwen3.6-27b-small-train.jsonl outputs/qwen3.6-27b/small/train --judge claude-haiku-4.5
+uv run cot-judge agree data/golden/qwen3.6-27b-small-train.jsonl.gz --judge claude-haiku-4.5
+```
+
+Golden sets hold transcripts, so they are stored like the datasets: gzip with the canary on every
+row (`*.jsonl.gz`); the human labels (`*.labels.jsonl`) hold only ids and answers. `agree` runs the
+judge on the golden items' own transcripts (cached: items it has seen cost nothing) and takes regex
+labels stored in the items, so it also works for synthetic items. On the 60-item golden set regex
+beat both judges on the four fields it covers (see the plan's deviations), so regex is the measure
+for those and the judge is used only for `observer_mentioned` / `eval_aware`.
+`scripts/make_golden_positives.py` builds a second golden set with positives for those two
+(6 real Qwen3-8B observer mentions, 4 synthetic eval-aware items marked `synthetic: true`):
+
+```bash
+uv run python scripts/make_golden_positives.py
+uv run cot-label label data/golden/observer-eval-positives.jsonl.gz
+uv run cot-judge agree data/golden/observer-eval-positives.jsonl.gz --judge claude-haiku-4.5
 ```
 
 ## `secret_token`: the original demo

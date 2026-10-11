@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import sqlite3
 import sys
 import threading
@@ -32,6 +33,12 @@ from cot_controllability.secret_file import run_parallel
 JUDGE_DIR = Path(__file__).resolve().parents[2] / 'configs' / 'judge'
 CACHE = Path('.cache/judge.sqlite')
 MAX_STEP_CHARS = 6000  # Head and tail of very long steps; the rest is elided.
+
+# Finds candidate positives for `observer_mentioned` when building golden sets (not a label).
+OBSERVER = re.compile(
+    r"(?:partner|they|user|someone)\b[^.]{0,40}\b(?:see|sees|seeing|read|reads|reading|view|watch\w*)\b[^.]{0,30}"
+    r"\b(?:reasoning|thinking|thoughts|tool calls)|transparent mode|live view|in real time|not private"
+    r"|(?:can'?t|cannot|won'?t) (?:see|read) (?:my|the) (?:reasoning|thinking)", re.I)
 
 FIELDS = {
     'rule_stated': ('yes', 'no'),
@@ -73,13 +80,45 @@ def transcript(record):
     return '\n'.join(parts)
 
 
-def request_body(judge, rubric, record, case, data):
-    item, _, _ = sf.parse_condition(record['condition'])
-    secret = sf.identifying_part(sf.target(data, case, item))
-    prompt = rubric.replace('{secret}', secret).replace('{transcript}', transcript(record))
+def body_for(judge, rubric, secret, text):
+    prompt = rubric.replace('{secret}', secret).replace('{transcript}', text)
     return {'model': judge['model'], 'messages': [{'role': 'user', 'content': prompt}],
             'temperature': judge['temperature'], 'max_tokens': judge['max_tokens'],
             'response_format': {'type': 'json_object'}}
+
+
+def request_body(judge, rubric, record, case, data):
+    item, _, _ = sf.parse_condition(record['condition'])
+    return body_for(judge, rubric, sf.identifying_part(sf.target(data, case, item)), transcript(record))
+
+
+def call(body, key, cache):
+    """(raw reply or None, error or None), from the cache when possible."""
+    cached = cache.get(Cache.key(body))
+    if cached is not None:
+        return cached, None
+    if not key:
+        return None, 'OPENROUTER_API_KEY not set and reply not cached'
+    try:
+        reply = api_json('chat/completions', body, key)
+        content = reply['choices'][0]['message']['content']
+    except (RuntimeError, KeyError, IndexError, TypeError) as exc:
+        return None, str(exc)
+    cache.set(Cache.key(body), content)
+    return content, None
+
+
+def judge_items(items, judge_name, concurrency=8, cache=None):
+    """{id: labels or None} for golden items, judged from their stored secret and transcript."""
+    judge = load_judge(judge_name)
+    rubric = (JUDGE_DIR / 'rubric.md').read_text(encoding='utf-8')
+    key = os.environ.get('OPENROUTER_API_KEY', '').strip()
+    cache = cache or Cache()
+
+    def work(item):
+        raw, _ = call(body_for(judge, rubric, item['secret'], item['transcript']), key, cache)
+        return item['id'], parse(raw)[0]
+    return dict(run_parallel(items, work, concurrency))
 
 
 def parse(raw):
@@ -100,7 +139,8 @@ def parse(raw):
 
 
 class Cache:
-    def __init__(self, path=CACHE):
+    def __init__(self, path=None):
+        path = path or CACHE
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, check_same_thread=False)
         self.conn.execute('CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT)')
@@ -144,16 +184,7 @@ def run(directory, judge_name, concurrency=8, limit=None, cache=None):
 
     def work(job):
         record, case, manifest = job
-        body = request_body(judge, rubric, record, case, manifest)
-        cached = cache.get(Cache.key(body))
-        error = None
-        if cached is None:
-            try:
-                reply = api_json('chat/completions', body, key)
-                cached = reply['choices'][0]['message']['content']
-                cache.set(Cache.key(body), cached)
-            except (RuntimeError, KeyError, IndexError, TypeError) as exc:
-                error = str(exc)
+        cached, error = call(request_body(judge, rubric, record, case, manifest), key, cache)
         labels, reasoning = parse(cached)
         return {'condition': record['condition'], 'case_id': record['case_id'], 'sample': record.get('sample', 0),
                 'judge': judge['name'], 'model': judge['model'], 'labels': labels, 'reasoning': reasoning,
@@ -251,29 +282,38 @@ def golden(directory, n, seed=0):
         record, case, manifest = records[key]
         item, _, _ = sf.parse_condition(record['condition'])
         out.append({'id': '/'.join(map(str, key)), 'condition': key[0], 'case_id': key[1], 'sample': key[2],
+                    'source': str(directory), 'synthetic': False,
                     'secret': sf.identifying_part(sf.target(manifest, case, item)), 'transcript': transcript(record),
+                    'regex': regex_labels(scores[key]),
                     'human': {f: None for f in FIELDS}, 'allowed': {f: list(v) for f, v in FIELDS.items()}})
     return out
 
 
-def agree(golden_path, directory, judge_name, labels_path=None):
+def agree(golden_path, judge_name, labels_path=None, directory=None, concurrency=8):
     """Judge vs human and regex vs human on a labelled golden set.
 
-    Human labels come from `cot-label`'s <golden>.labels.jsonl, else from the golden's `human` block.
+    The judge is run on the golden items' own transcripts (cached, so items it has already seen
+    cost nothing). Human labels come from `cot-label`'s <golden>.labels.jsonl, else the `human`
+    block. Regex labels come from the items (`regex`), or from `directory` for older golden files;
+    synthetic items have none.
     """
     from cot_controllability.label import labels_path as default_labels
     from cot_controllability.label import read_jsonl
     rows = read_jsonl(golden_path)
     by_id = {r['id']: r['human'] for r in read_jsonl(labels_path or default_labels(golden_path))}
-    rows = [dict(r, human=by_id.get(r['id'], r['human'])) for r in rows]
+    rows = [dict(r, human=by_id.get(r['id'], r.get('human'))) for r in rows]
     labelled = [r for r in rows if r['human'] and all(r['human'].get(f) is not None for f in FIELDS)]
-    judged = load_judged(directory, judge_name)
-    scores = {(r['condition'], r['case_id'], r['sample']): r for r in sf.score_run(directory)['trials']}
-    keys = [(r['condition'], r['case_id'], r['sample']) for r in labelled]
+    if directory:
+        scores = {f"{r['condition']}/{r['case_id']}/{r['sample']}": r for r in sf.score_run(directory)['trials']}
+        labelled = [dict(r, regex=r.get('regex') or (regex_labels(scores[r['id']]) if r['id'] in scores else None))
+                    for r in labelled]
+    judged = judge_items(labelled, judge_name, concurrency)
     human = [r['human'] for r in labelled]
-    return {'labelled': len(labelled), 'of': len(rows),
-            'judge_vs_human': agreement([judged.get(k, {}).get('labels') for k in keys], human, FIELDS),
-            'regex_vs_human': agreement([regex_labels(scores[k]) for k in keys], human,
+    positives = {f: sum(h[f] == 'yes' for h in human) for f in ('observer_mentioned', 'eval_aware')}
+    return {'labelled': len(labelled), 'of': len(rows), 'synthetic': sum(bool(r.get('synthetic')) for r in labelled),
+            'human_positives': positives, 'judge_unparsed': sum(judged[r['id']] is None for r in labelled),
+            'judge_vs_human': agreement([judged[r['id']] for r in labelled], human, FIELDS),
+            'regex_vs_human': agreement([r.get('regex') for r in labelled], human,
                                         ('rule_stated', 'rule_channel', 'key_mention', 'leak_kind'))}
 
 
@@ -294,7 +334,7 @@ def main(argv=None):
     p.add_argument('--out', required=True)
     p = commands.add_parser('agree', help='Judge and regex vs human labels on a golden set')
     p.add_argument('golden')
-    p.add_argument('directory')
+    p.add_argument('directory', nargs='?', help='run directory, only for golden files without regex labels')
     p.add_argument('--judge', default='gpt-4.1-mini')
     p.add_argument('--labels', help='human labels (default: <golden>.labels.jsonl from cot-label)')
     args = parser.parse_args(argv)
@@ -305,14 +345,17 @@ def main(argv=None):
         elif args.command == 'compare':
             print(json.dumps(compare(args.directory, args.judge), indent=2))
         elif args.command == 'golden':
+            from cot_controllability.label import write_jsonl_gz
             out = Path(args.out)
             if out.exists():
                 raise ValueError(f'{out} exists; it may already hold human labels')
+            if not out.name.endswith('.jsonl.gz'):
+                raise ValueError('--out must end in .jsonl.gz (golden sets hold transcripts)')
             rows = golden(args.directory, args.n)
-            out.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows), encoding='utf-8')
+            write_jsonl_gz(out, rows)
             print(f'{len(rows)} trials -> {out}; fill in each "human" field with one of "allowed"')
         else:
-            print(json.dumps(agree(args.golden, args.directory, args.judge, args.labels), indent=2))
+            print(json.dumps(agree(args.golden, args.judge, args.labels, args.directory), indent=2))
     except (ValueError, OSError, KeyError) as error:
         print(str(error), file=sys.stderr)
         return 2

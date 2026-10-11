@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import os
 import random
@@ -60,14 +61,23 @@ def implied(field, answers):
 
 def labels_path(golden):
     golden = Path(golden)
-    return golden.with_name(golden.name.removesuffix('.jsonl') + '.labels.jsonl')
+    return golden.with_name(golden.name.removesuffix('.gz').removesuffix('.jsonl') + '.labels.jsonl')
 
 
 def read_jsonl(path):
+    """Rows of a JSONL file; `.gz` files are decompressed (golden sets are stored that way)."""
     path = Path(path)
     if not path.exists():
         return []
-    return [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+    raw = gzip.decompress(path.read_bytes()) if path.suffix == '.gz' else path.read_bytes()
+    return [json.loads(line) for line in raw.decode('utf-8').splitlines() if line.strip()]
+
+
+def write_jsonl_gz(path, rows):
+    """Golden sets hold transcripts: gzip them with the canary on every row, like the datasets."""
+    from cot_controllability.common import CANARY
+    text = ''.join(json.dumps({'canary': CANARY, **r}, ensure_ascii=False) + '\n' for r in rows)
+    Path(path).write_bytes(gzip.compress(text.encode('utf-8'), mtime=0))
 
 
 def save_labels(path, labels):
