@@ -16,7 +16,7 @@ visible, and does it avoid writing the secret there, on its own or when told to?
 | Step | Status |
 | --- | --- |
 | Original demo (`secret_token`, token pasted in the prompt, Kimi-K3) | done (by Bianca) |
-| New task (`secret_file`), 17 conditions, controls, scoring, tests | done |
+| New task (`secret_file`), 21 conditions, controls, scoring, tests | done |
 | Qwen3-8B on the `train` and `validation` splits | **done — results below** |
 | Leak details (full/partial, restate vs "meta" sentence), refusal metric, salient-observer conditions | done, not yet run |
 | Run the new conditions on Qwen3-8B, then freeze the plan | to do |
