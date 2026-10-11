@@ -256,9 +256,16 @@ def golden(directory, n, seed=0):
     return out
 
 
-def agree(golden_path, directory, judge_name):
-    """Judge vs human and regex vs human on a labelled golden set."""
-    rows = [json.loads(line) for line in Path(golden_path).read_text(encoding='utf-8').splitlines() if line.strip()]
+def agree(golden_path, directory, judge_name, labels_path=None):
+    """Judge vs human and regex vs human on a labelled golden set.
+
+    Human labels come from `cot-label`'s <golden>.labels.jsonl, else from the golden's `human` block.
+    """
+    from cot_controllability.label import labels_path as default_labels
+    from cot_controllability.label import read_jsonl
+    rows = read_jsonl(golden_path)
+    by_id = {r['id']: r['human'] for r in read_jsonl(labels_path or default_labels(golden_path))}
+    rows = [dict(r, human=by_id.get(r['id'], r['human'])) for r in rows]
     labelled = [r for r in rows if r['human'] and all(r['human'].get(f) is not None for f in FIELDS)]
     judged = load_judged(directory, judge_name)
     scores = {(r['condition'], r['case_id'], r['sample']): r for r in sf.score_run(directory)['trials']}
@@ -289,6 +296,7 @@ def main(argv=None):
     p.add_argument('golden')
     p.add_argument('directory')
     p.add_argument('--judge', default='gpt-4.1-mini')
+    p.add_argument('--labels', help='human labels (default: <golden>.labels.jsonl from cot-label)')
     args = parser.parse_args(argv)
     try:
         if args.command == 'run':
@@ -304,7 +312,7 @@ def main(argv=None):
             out.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows), encoding='utf-8')
             print(f'{len(rows)} trials -> {out}; fill in each "human" field with one of "allowed"')
         else:
-            print(json.dumps(agree(args.golden, args.directory, args.judge), indent=2))
+            print(json.dumps(agree(args.golden, args.directory, args.judge, args.labels), indent=2))
     except (ValueError, OSError, KeyError) as error:
         print(str(error), file=sys.stderr)
         return 2

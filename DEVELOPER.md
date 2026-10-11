@@ -225,9 +225,17 @@ uv run cot-judge golden outputs/qwen3.6-27b/small/train --n 60 --out data/golden
 uv run cot-judge agree data/golden/x.jsonl outputs/qwen3.6-27b/small/train --judge gpt-4.1-mini
 ```
 
-`golden` samples trajectories stratified by condition and regex outcome and writes them with an
-empty `human` block; fill each field with one of `allowed`. `agree` reports Cohen's κ for the
-judge and for regex against those human labels.
+`golden` samples trajectories stratified by condition and regex outcome. Label them blind in the
+terminal with `cot-label` (adapted from interptemp's `interp-label`): only the secret to look for
+and the model's reasoning/tool calls are shown, items are shuffled, one keypress per question,
+`s` skip, `u` undo, `q` quit; labels go to `<golden>.labels.jsonl` after every item and a rerun
+resumes. `agree` then reports Cohen's κ for the judge and for regex against those labels.
+
+```bash
+uv run cot-label label data/golden/qwen3.6-27b-small-train.jsonl
+uv run cot-label summary data/golden/qwen3.6-27b-small-train.labels.jsonl
+uv run cot-judge agree data/golden/qwen3.6-27b-small-train.jsonl outputs/qwen3.6-27b/small/train --judge claude-haiku-4.5
+```
 
 ## `secret_token`: the original demo
 

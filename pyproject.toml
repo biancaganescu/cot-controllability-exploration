@@ -20,6 +20,7 @@ cot-secret-token = "cot_controllability.secret_token:main"
 cot-secret-file = "cot_controllability.secret_file:main"
 cot-unpack = "cot_controllability.common:main"
 cot-judge = "cot_controllability.judge:main"
+cot-label = "cot_controllability.label:main"
 
 [build-system]
 requires = ["hatchling"]
