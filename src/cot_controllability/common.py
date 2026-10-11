@@ -52,7 +52,7 @@ def reasoning_variants(message):
     return variants, opaque
 
 
-def api_json(path, body=None, key=None, base=API):
+def api_json(path, body=None, key=None, base=API, timeout=600):
     """Call an OpenAI-compatible JSON API (OpenRouter by default, or a local vLLM server)."""
     headers = {'Content-Type': 'application/json'}
     if key:
@@ -60,7 +60,7 @@ def api_json(path, body=None, key=None, base=API):
     request = Request(base + path, headers=headers,
                       data=json.dumps(body).encode() if body is not None else None)
     try:
-        with urlopen(request, timeout=600) as response:
+        with urlopen(request, timeout=timeout) as response:
             return json.load(response)
     except HTTPError as error:
         # Do not echo response bodies: an upstream error might contain secrets.

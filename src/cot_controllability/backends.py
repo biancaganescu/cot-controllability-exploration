@@ -137,6 +137,9 @@ class VLLMBackend(Backend):
         base = os.environ.get('VLLM_BASE_URL') or cfg.options.get('base_url', 'http://localhost:8000/v1/')
         self.base_url = base.rstrip('/') + '/'
         self.key = os.environ.get('VLLM_API_KEY', '').strip() or None
+        # Under full load each request gets a small share of the GPU, so a long reasoning reply can
+        # take many minutes; only GPU time is spent while waiting.
+        self.timeout = float(cfg.options.get('timeout_s', 3600))
 
     def preflight(self, first_requests, max_steps):
         served = [m.get('id') for m in api_json('models', key=self.key, base=self.base_url).get('data', [])]
@@ -156,7 +159,7 @@ class VLLMBackend(Backend):
         return body
 
     def send(self, body):
-        return api_json('chat/completions', body, self.key, base=self.base_url)
+        return api_json('chat/completions', body, self.key, base=self.base_url, timeout=self.timeout)
 
     def bound(self, raw):
         return isinstance(raw, dict) and not raw.get('error') and raw.get('model') == self.cfg.model

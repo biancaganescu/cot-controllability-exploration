@@ -542,6 +542,7 @@ class SecretFileTests(unittest.TestCase):
             record = sf.run_trial(self.data, self.case, 'public-none', 0, Path(parent) / 't.trial.json.gz', qwen)
         self.assertEqual(record['status'], 'answered')
         self.assertEqual(bases, ['http://pod:9000/v1/'] * 2)
+        self.assertEqual(qwen.timeout, 3600)  # Long replies under full GPU load must not time out.
         history = record['requests'][1]['messages'][2]
         self.assertEqual(history['reasoning_content'], 'List first.')  # What Qwen templates read.
         self.assertNotIn('reasoning', history)
