@@ -4,6 +4,7 @@
 own visible thinking (its chain of thought, "CoT")? And is that control stronger when the model has
 its own reason (*intrinsic*) than when it is told (*instructed*)?
 
+- Where it started: Bianca's slides, [Can models control their reasoning for their own reasons?](docs/presentation.pdf) (Kimi K3, intrinsic vs instructed)
 - How to run it: [DEVELOPER.md](DEVELOPER.md)
 - Design, hypotheses, predictions: [docs/experiment-plan.md](docs/experiment-plan.md)
 - Full tables: [iteration 1](docs/results-iteration-1.md) · [iteration 2](docs/results-iteration-2.md) · [iteration 3](docs/results-iteration-3.md)
