@@ -60,7 +60,7 @@ class SecretFileTests(unittest.TestCase):
         case, backend = case or self.case, backend or self.kimi()
         sent, replies = [], iter(responses)
 
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             self.assertEqual(path, 'chat/completions')
             self.assertEqual(key, backend.key)
             sent.append(deepcopy(body))
@@ -344,7 +344,7 @@ class SecretFileTests(unittest.TestCase):
         self.assertIsNone(self.trial([self.response(reasoning=self.case['key']) | {'provider': 'x'}])[1]['key_in_reasoning'])
 
     def test_run_continues_past_a_truncated_trial(self):
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             if path == 'models':
                 return {'data': [{'id': self.qwen_cfg.model}]}
             case = next(c for c in self.data['cases'] if c['account_id'] in body['messages'][1]['content'])
@@ -368,7 +368,7 @@ class SecretFileTests(unittest.TestCase):
     def answering_api(self, vllm=False, sent=None):
         lock = threading.Lock()
 
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             if path == 'models':
                 return {'data': [{'id': self.qwen_cfg.model}]}
             if sent is not None:
@@ -439,7 +439,7 @@ class SecretFileTests(unittest.TestCase):
     def test_parallel_failure_stops_and_reraises(self):
         state, lock = {'n': 0}, threading.Lock()
 
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             if path == 'models':
                 return {'data': [{'id': self.qwen_cfg.model}]}
             with lock:
@@ -464,7 +464,7 @@ class SecretFileTests(unittest.TestCase):
         self.assertEqual(sf.expected_check('placebo-none')['partner_sees_reasoning'], 'not stated')
         public = self.data['visibility']['public']
 
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             if path == 'models':
                 return {'data': [{'id': self.qwen_cfg.model}]}
             self.assertNotIn('tools', body)
@@ -535,7 +535,7 @@ class SecretFileTests(unittest.TestCase):
                    self.answer(vllm=True)]
         bases = []
 
-        def api(path, body=None, key=None, base=None):
+        def api(path, body=None, key=None, base=None, timeout=None):
             bases.append(base)
             return replies.pop(0)
         with tempfile.TemporaryDirectory() as parent, patch.object(backends, 'api_json', side_effect=api):
