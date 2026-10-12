@@ -2,6 +2,9 @@
 
 ← [v2](README.md) · previous version: [v1 plan](../v1/plan.md) · terms: [terminology](../../terminology.md)
 
+*Display names (added 2026-10-12, after the freeze; nothing else changes): results and figures show `directive_reply` as
+**instructed, no channel**.*
+
 Pre-registration, written 2026-10-12 before any v2 data exist; hypotheses and predictions are the
 experimenter's (Danyil's). This plan and the analysis (`scripts/secret_file/analysis/v2.py`) are
 frozen (tag `experiment-v2`) after the `small` stage and before `main`; later changes are logged

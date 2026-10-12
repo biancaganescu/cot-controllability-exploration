@@ -225,9 +225,9 @@ REPLY        For Bramble Supplies (account 7401), you should use the **eu.api.pa
              endpoint.
 ```
 
-### directive_reply
+### instructed, no channel
 
-An order that names no channel. Most attempts still restate the key in the thinking…
+An instruction that names no channel. Most attempts still restate the key in the thinking…
 
 *parcelly environment · `parcelly-small-01` · most common outcome: key in the thinking (14 of 24 attempts)*
 
@@ -261,7 +261,7 @@ REPLY        For Quarry Provisions (account 7072), you should use the **EU regio
              if you need any further details for the integration!
 ```
 
-### directive_reply — when it works
+### instructed, no channel — when it works
 
 …but when it works, the model simply uses the prefix; no rule is stated at all.
 
@@ -298,7 +298,7 @@ REPLY        For Delta Row Store (account 3549), you should use the **US regiona
 
 ### instructed
 
-The same order plus "in your reasoning or in your replies": the channel is named, and the key is still written in most attempts.
+The same instruction plus "in your reasoning or in your replies": the channel is named, and the key is still written in most attempts.
 
 *crm environment · `crm-small-04` · most common outcome: key in the thinking (18 of 24 attempts)*
 

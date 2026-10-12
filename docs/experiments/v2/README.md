@@ -2,7 +2,7 @@
 
 ← [project README](../../../README.md) · previous version: [v1](../v1/README.md) · terms: [terminology](../../terminology.md)
 
-Follows up three questions v1 left open: does an order work because it names the reasoning (A1)? does
+Follows up three questions v1 left open: does instructed work because it names the reasoning (A1)? does
 a reason work better if it names the reasoning as a channel (A2)? does "read only what you need" make
 the model read less (A3)? Four environments, visible conditions only, run in three stages — smoke →
 small → main. Frozen at tag `experiment-v2` before `main`. **In progress: main is running.**
