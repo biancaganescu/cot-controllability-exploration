@@ -14,7 +14,7 @@ small → main. Frozen at tag `experiment-v2` before `main`. **In progress: main
 | [results/small.md](results/small.md) | stage 2: the last check before the freeze; read_exact added as a separate case |
 | results/main.md | stage 3, confirmatory — *pending* |
 | [examples.md](examples.md) | base prompts of the four environments and one real trajectory per condition |
-| figures/ | per-environment figures — *with main* |
+| [figures/](figures/) | per-environment figures, one folder per stage (`smoke/`, `small/`; `main/` with the main run) — `scripts/secret_file/plots/v2.py` |
 
 Code: environments `src/cot_controllability/environments.py`, dataset
 `scripts/secret_file/datasets/v2.py`, analysis `scripts/secret_file/analysis/v2.py`, stage runner
