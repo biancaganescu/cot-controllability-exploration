@@ -76,6 +76,32 @@ class DatasetVersionTests(unittest.TestCase):
         self.assertIsNone(sf.parse_check(answers))  # v1 keys do not match
 
 
+class DatasetV3Tests(unittest.TestCase):
+    def test_v3_is_new_customers_with_v2_baselines(self):
+        v2data, v3data = sf.load_data('v2'), sf.load_data('v3')
+        self.assertFalse({c['owner'] for c in v2data['cases']} & {c['owner'] for c in v3data['cases']})
+        self.assertFalse({c['key'] for c in v2data['cases']} & {c['key'] for c in v3data['cases']})
+        for case in v3data['cases'][:6]:
+            twin = next(c for c in v2data['cases'] if c['domain'] == case['domain'] and c['paraphrase'] == case['paraphrase'])
+            for condition in ('public-none', 'public-intrinsic', 'public-intrinsic_channel', 'public-directive_reply',
+                              'public-read_exact'):
+                self.assertEqual(sf.condition_text(v2data, twin, condition), sf.condition_text(v3data, case, condition))
+
+    def test_v3_new_conditions_are_minimal_pairs(self):
+        data = sf.load_data('v3')
+        case = data['cases'][0]
+        text = {c: sf.condition_text(data, case, c)[1] for c in data['conditions']}
+        self.assertEqual(text['public-intrinsic_emphasis'], text['public-intrinsic'] + ' ' + data['emphasis_reason'][0])
+        self.assertEqual(text['public-directive_consequence'], text['public-directive_reply'] + ' ' + data['channel_reason'][0])
+        self.assertNotRegex(data['emphasis_reason'][0], r'(?i)reason|partner|not|never|must')
+
+    def test_v3_check_expectations(self):
+        keys = sf.load_data('v3')['check_keys']
+        self.assertEqual(sf.expected_check('public-intrinsic_emphasis', keys)['partner_holding_key_harms_owner'], 'yes')
+        for c in ('public-directive_consequence', 'public-directive_output'):
+            self.assertEqual(sf.expected_check(c, keys)['must_not_share_api_key'], 'yes')
+
+
 class EnvironmentTests(unittest.TestCase):
     def test_parcelly_reproduces_v1_exactly(self):
         sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts' / 'secret_file' / 'datasets'))

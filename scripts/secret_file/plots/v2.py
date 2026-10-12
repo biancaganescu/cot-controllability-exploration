@@ -44,6 +44,7 @@ ROWS = [('none', 'public-none'), ('intrinsic', 'public-intrinsic'), ('intrinsic 
 CONTRASTS = [('A1: instructed − instructed + channel', 'public-directive_reply', 'public-instructed', (0.10, 0.20)),
              ('A2: intrinsic + channel − intrinsic', 'public-intrinsic_channel', 'public-intrinsic', (-0.15, -0.10))]
 LEAK, READ = 'secret_in_reasoning', 'read_range_used'
+READING = ('public-none', 'public-read_limit', 'public-read_exact')  # rows of the reading figure
 
 
 def footnote(ax, text, pad=10):
@@ -257,8 +258,7 @@ def rule_timing(rows, out):
 
 
 def reading(rows, out):
-    present = [(label, c) for label, c in ROWS if c in ('public-none', 'public-read_limit', 'public-read_exact')
-               and any(r['condition'] == c for r in rows)]
+    present = [(label, c) for label, c in ROWS if c in READING and any(r['condition'] == c for r in rows)]
     fig, ax = plt.subplots(figsize=(6.4, 0.42 * len(present) + 1.2))
     for i, (_, c) in enumerate(present):
         m, lo, hi = bootstrap([r for r in rows if r['condition'] == c], READ)
