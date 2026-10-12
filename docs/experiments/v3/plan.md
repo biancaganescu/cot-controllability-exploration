@@ -68,6 +68,24 @@ was about stressing the key, not about the reasoning; if it does little, it was 
 As in v2 (visibility, tool results, harm, must not share, and the knowledge question). Expected: harm
 = yes under the three intrinsic conditions; must not share = yes under the three instructed ones.
 
+## Outcome on main (checked 2026-10-12; tables in [results/main.md](results/main.md))
+
+| | Prediction | Result | Verdict |
+| --- | --- | --- | --- |
+| **B1** (a) | emphasis − intrinsic in [−20, −10], < 0 after Holm | −8 [−14, −3], Holm p = 0.002 | direction supported; smaller than predicted |
+| B1 (b) | emphasis − instructed > 0 | +15 [+7, +23] | supported |
+| **B2** | consequence − instructed in [−10, −3], < 0 after Holm | −6 [−13, +2], Holm p = 0.13 | not supported (estimate inside the range, CI includes 0) |
+| **B3** (a) | about own writing − instructed < 0 after Holm | −15 [−24, −7], Holm p < 0.001 | supported |
+| B3 (b) | lowest leak among the seven non-concrete conditions | 56%, next 65% (intrinsic + channel) | supported |
+| **B4** | write_exact leak rate CI above 50% | 84% [79%, 89%] | supported |
+
+Reading B1 as planned: emphasis does a little (−8), the reasoning sentence about four times as much
+(−30; −21 against emphasis), so v2's effect is mostly about the reasoning.
+
 ## Deviations
 
-(none yet)
+- **2026-10-12, B4 in the Holm family.** `analysis/v3.py` put write_exact − instructed (predicted < 0)
+  into the Holm family with B1–B3; B4's criterion in the table above is the leak rate's CI, which is
+  not a p-value. With B4's contrast left out (Holm over three), B1 and B3 stay significant (adjusted
+  p ≈ 0.0014 and 0.0003) and B2 does not (≈ 0.067). The verdicts use the criteria as written.
+- **2026-10-12, small was run** (the plan allowed skipping it); it passed the gate on other customers.

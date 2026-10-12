@@ -84,6 +84,12 @@ and payments (w4: −10 to 0 points; w1–w3 and w5: −20 to −60), so it is n
 
 #### Why w4 and w6 (post-hoc, added 2026-10-12)
 
+> **Update after v3 main:** on new customers with the same six wordings, w4 does *not* fail (−31
+> points) and w6 is weaker but not zero (−16); see [v3 main](../../v3/results/main.md#wording-the-v2-post-hoc-split-on-new-customers).
+> Each v2 customer has one wording, so the split below is most likely a customer effect. What
+> replicates is the *target* of the rule: under w4 and w6 it is more often about the reply only (v3:
+> 12 and 16 of 32 vs 0–6). The cloud weakness also replicates.
+
 Read after the results, not planned; 40 attempts per wording. For each attempt under intrinsic +
 channel we looked at the thinking right after the key file is read and asked three simple questions:
 
