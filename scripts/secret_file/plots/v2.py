@@ -87,18 +87,29 @@ GROUPS = [('baseline', ['public-none']), ('intrinsic', ['public-intrinsic', 'pub
           ('instructed', ['public-directive_reply', 'public-instructed']),
           ('reading', ['public-read_limit', 'public-read_exact'])]
 LABEL = {c: label for label, c in ROWS}
+# Group header and bar colour in the headline figure, so intrinsic and instructed read apart at a glance
+# (palette checked with the dataviz validator: CVD and normal-vision separation pass).
+GROUP_STYLE = {'baseline': ('', GRAY),  # '' = no header: the row label says it
+               'intrinsic': ('intrinsic: a reason', ORANGE), 'instructed': ('instructed: a rule', BLUE),
+               'reading': ('instructed: what to read', AQUA)}
 SEQ = ['#eef4fc', '#cfe0f7', '#9fc2ee', '#6aa1e3', '#2a78d6', '#1c5aa6', '#123d70']  # one hue, light -> dark
 
 
-def layout(rows):
-    """[(label, condition) or None for a gap], only conditions present in the run."""
+def layout(rows, headers=False):
+    """[(label, condition) or None for a gap], only conditions present in the run; with `headers`, a
+    ('header', group) row instead of each gap (and before the first group)."""
     present = {r['condition'] for r in rows}
     out = []
-    for _, conditions in GROUPS:
+    for name, conditions in GROUPS:
         group = [(LABEL[c], c) for c in conditions if c in present]
         if group:
-            out += ([None] if out else []) + group
+            header = headers and GROUP_STYLE[name][0]
+            out += ([('header', name)] if header else [None] if out else []) + group
     return out
+
+
+def group_of(condition):
+    return next(name for name, conditions in GROUPS if condition in conditions)
 
 
 def count(rows, condition, key=LEAK, domain=None):
@@ -114,17 +125,23 @@ def per_condition_n(rows):
 
 def leak_by_condition(rows, out, title='How often the model leaks the key, by what it is told',
                       note=None, name='leak_by_condition.png'):
-    """The headline: one bar per condition, all environments pooled, labelled with k / n."""
-    items = layout(rows)
+    """The headline: one bar per condition, all environments pooled, labelled with k / n; a coloured
+    header names each group."""
+    items = layout(rows, headers=True)
     fig, ax = plt.subplots(figsize=(6.4, 0.34 * len(items) + 1.3))
     ticks, labels = [], []
     for i, item in enumerate(items):
         if item is None:
             continue
+        if item[0] == 'header':
+            text, colour = GROUP_STYLE[item[1]]
+            ax.text(0, i + 0.15, text, transform=ax.get_yaxis_transform(), ha='right', va='center',
+                    fontsize=8, fontweight='bold', color=colour)
+            continue
         label, c = item
         k, n = count(rows, c)
         m, lo, hi = bootstrap([r for r in rows if r['condition'] == c], LEAK)
-        ax.barh(i, 100 * m, height=0.62, color=AQUA if c.endswith('read_exact') else BLUE)
+        ax.barh(i, 100 * m, height=0.62, color=GROUP_STYLE[group_of(c)][1])
         ax.plot([100 * lo, 100 * hi], [i, i], color=INK, lw=1)
         ax.text(100 * max(m, hi) + 1.5, i, f'{100 * m:.0f}%  ({k}/{n})', va='center', fontsize=7.5, color=INK)
         ticks.append(i)

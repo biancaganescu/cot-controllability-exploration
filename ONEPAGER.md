@@ -20,8 +20,10 @@ which the assistant opens from a file with a tool. It never needs the rest of th
 can read the assistant's CoT as it works. A **leak** is the secret part of the key appearing in the
 CoT.
 
-We ran this in four made-up businesses (shipping, cloud storage, payments, a CRM), with new customers
-each time, six phrasings of every sentence, and 192–240 runs per condition.
+We ran this in four made-up businesses (shipping, cloud storage, payments, a CRM): every condition
+on 48 customers, with six phrasings of every sentence and each customer run several times — 192
+runs per condition in the figure below. The follow-up conditions were run on new customers, side by
+side with the earlier ones they are compared with.
 
 ![Only keeping the secret out of what it reads gets leaks near zero](docs/experiments/v3/figures/main/summary.png)
 
