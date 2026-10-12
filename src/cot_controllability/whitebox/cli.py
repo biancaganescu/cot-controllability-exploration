@@ -55,6 +55,8 @@ def main(argv=None):
     sub.choices['extract'].add_argument('--layers', type=layer_list, help="e.g. '0:64:4' or '15,31,63' (default every 4th + last)")
     sub.choices['extract'].add_argument('--lens', help="lens file or 'repo_id:path/lens.pt'")
     sub.choices['extract'].add_argument('--topk', type=int, default=20)
+    sub.choices['extract'].add_argument('--tokenizer', help='chat template / tokenizer of the run (default: the model)')
+    sub.choices['extract'].add_argument('--dtype', default='bfloat16')
     p = sub.add_parser('probe')
     p.add_argument('features', help='extract output path without suffix')
     p.add_argument('--conditions', nargs='*')
@@ -71,7 +73,8 @@ def main(argv=None):
         return check(args)
     if args.command == 'extract':
         from cot_controllability.whitebox.extract import extract
-        extract(args.run, args.model, args.out, args.layers, args.lens, args.conditions, args.limit, args.topk)
+        extract(args.run, args.model, args.out, args.layers, args.lens, args.conditions, args.limit, args.topk,
+                args.dtype, args.tokenizer)
     elif args.command == 'probe':
         from cot_controllability.whitebox.probes import report
         report(args.features, args.conditions)

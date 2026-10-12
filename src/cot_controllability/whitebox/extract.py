@@ -9,7 +9,7 @@ up to the last decision point, and keep, at each point and each chosen layer,
 jlens.HFLensModel finds the decoder blocks, final norm and unembedding; jlens' own `apply()` is not
 used because it re-tokenizes a string and truncates at 512 tokens.
 
-Output: <out>.safetensors (residual [N, P, L, d] float16 with NaN where a point is missing; jlens_topk
+Output (`save`): <out>.safetensors (residual [N, P, L, d] float16 with NaN where a point is missing; jlens_topk
 and logit_topk [N, P, L, k] int32, -1 where missing) and <out>.json (one row per trial: condition,
 case, labels, points with their context; plus layers, points and the model).
 """
@@ -69,28 +69,26 @@ def load_lens(spec, jlens):
     return jlens.JacobianLens.from_pretrained(repo, filename=filename)
 
 
-def extract(run, model_name, out, layers=None, lens_path=None, conditions=None, limit=None, topk=20,
-            dtype='bfloat16'):
-    import jlens
+def collect(lm, items, layers, lens=None, topk=20):
+    """Run each (row, Replay, points) of `items` through `lm` (a jlens LensModel) and read the residual and
+    the lens top-k at every point and layer. Returns (rows, tensors) as `save` writes them."""
     import torch
-    import transformers
     from jlens.hooks import ActivationRecorder
-    from safetensors.torch import save_file
 
-    tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
-    hf = transformers.AutoModelForCausalLM.from_pretrained(model_name, dtype=getattr(torch, dtype), device_map='auto')
-    lm = jlens.from_hf(hf, tokenizer, force_bos=False)  # chat-template ids already carry what the model saw
-    layers = sorted(layers) if layers else list(range(0, lm.n_layers, 4)) + [lm.n_layers - 1]
-    lens = load_lens(lens_path, jlens) if lens_path else None
     if lens is not None:
         missing = set(layers) - set(lens.source_layers)
         if missing:
             raise ValueError(f'lens has no layers {sorted(missing)}')
-
+        # transport() moves J to the residual's device on every call; move the used layers once
+        lens.jacobians = {layer: lens.jacobians[layer].to(lm.input_device) for layer in layers}
     rows, residuals, jl, ll = [], [], [], []
     nan = torch.full((lm.d_model,), float('nan'), dtype=torch.float16)
     none = torch.full((topk,), -1, dtype=torch.int32)
-    for row, rep, points in examples(run, tokenizer, conditions, limit):
+
+    def top(h):
+        return lm.unembed(h).topk(topk).indices[0].int().cpu()
+
+    for row, rep, points in items:
         if not rep.prompt_ok:
             raise ValueError(f"{row['condition']} {row['case_id']} s{row['sample']}: replayed prompt has "
                              f'{rep.reasoning_start} tokens, vLLM saw {rep.expected_prompt_tokens}')
@@ -99,27 +97,49 @@ def extract(run, model_name, out, layers=None, lens_path=None, conditions=None, 
         with torch.no_grad(), ActivationRecorder(lm.layers, at=layers) as rec:
             lm.forward(ids)
             acts = {layer: rec.activations[layer][0].detach() for layer in layers}
-        res, jtop, ltop = [], [], []
-        for name in POINTS:
-            p = points.get(name)
-            res.append([acts[layer][p.index].half().cpu() if p else nan for layer in layers])
-            with torch.no_grad():
-                ltop.append([lm.unembed(acts[layer][p.index:p.index + 1].float()).topk(topk).indices[0].int().cpu()
-                             if p else none for layer in layers])
-                jtop.append([lm.unembed(lens.transport(acts[layer][p.index:p.index + 1].float(), layer)).topk(topk)
-                             .indices[0].int().cpu() if p and lens else none for layer in layers])
+            res, jtop, ltop = [], [], []
+            for name in POINTS:
+                p = points.get(name)
+                hs = {layer: acts[layer][p.index:p.index + 1].float() for layer in layers} if p else {}
+                res.append([hs[layer][0].half().cpu() if p else nan for layer in layers])
+                ltop.append([top(hs[layer]) if p else none for layer in layers])
+                jtop.append([top(lens.transport(hs[layer], layer)) if p and lens else none for layer in layers])
         residuals.append(torch.stack([torch.stack(r) for r in res]))
         ll.append(torch.stack([torch.stack(t) for t in ltop]))
         jl.append(torch.stack([torch.stack(t) for t in jtop]))
         rows.append(meta(row, rep, points, key_step(row)))
         if len(rows) % 50 == 0:
             print(f'[{len(rows)}] {row["condition"]} {row["case_id"]} s{row["sample"]}', flush=True)
+    if not rows:
+        raise ValueError('no trials to extract')
+    return rows, {'residual': torch.stack(residuals), 'jlens_topk': torch.stack(jl), 'logit_topk': torch.stack(ll)}
+
+
+def save(out, rows, tensors, **info):
+    from safetensors.torch import save_file
 
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    save_file({'residual': torch.stack(residuals), 'jlens_topk': torch.stack(jl), 'logit_topk': torch.stack(ll)},
-              str(out.with_suffix('.safetensors')))
-    out.with_suffix('.json').write_text(json.dumps({
-        'canary': sf.CANARY, 'run': str(run), 'model': model_name, 'lens': lens_path, 'layers': layers,
-        'points': list(POINTS), 'topk': topk, 'rows': rows}, indent=1))
-    print(f'wrote {len(rows)} examples x {len(POINTS)} points x {len(layers)} layers to {out}.{{safetensors,json}}')
+    save_file(tensors, str(out) + '.safetensors')
+    Path(str(out) + '.json').write_text(json.dumps({'canary': sf.CANARY, **info, 'points': list(POINTS), 'rows': rows}, indent=1))
+    print(f"wrote {len(rows)} examples x {len(POINTS)} points x {len(info['layers'])} layers to {out}.{{safetensors,json}}")
+
+
+def extract(run, model_name, out, layers=None, lens_path=None, conditions=None, limit=None, topk=20,
+            dtype='bfloat16', tokenizer_name=None):
+    """`tokenizer_name` (default: the model's) renders the chat template: it must be the one vLLM used for
+    the run, e.g. Qwen3.6-27B's when a smaller model of the family replays Qwen3.6-27B's trajectories."""
+    import jlens
+    import torch
+    import transformers
+
+    tokenizer = transformers.AutoTokenizer.from_pretrained(tokenizer_name or model_name)
+    # device_map='auto' spreads the model over the GPUs; on a laptop it picks MPS, where loading segfaults
+    device_map = 'auto' if torch.cuda.is_available() else 'cpu'
+    hf = transformers.AutoModelForCausalLM.from_pretrained(model_name, dtype=getattr(torch, dtype), device_map=device_map)
+    lm = jlens.from_hf(hf, tokenizer, force_bos=False)  # chat-template ids already carry what the model saw
+    layers = sorted(layers) if layers else sorted(set(range(0, lm.n_layers, 4)) | {lm.n_layers - 1})
+    lens = load_lens(lens_path, jlens) if lens_path else None
+    rows, tensors = collect(lm, examples(run, tokenizer, conditions, limit), layers, lens, topk)
+    save(out, rows, tensors, run=str(run), model=model_name, tokenizer=tokenizer_name or model_name,
+         lens=lens_path, layers=layers, topk=topk)

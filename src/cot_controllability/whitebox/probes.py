@@ -18,8 +18,7 @@ import numpy as np
 
 def load(path):
     from safetensors.numpy import load_file
-    path = Path(path)
-    return load_file(str(path.with_suffix('.safetensors'))), json.loads(path.with_suffix('.json').read_text())
+    return load_file(f'{path}.safetensors'), json.loads(Path(f'{path}.json').read_text())
 
 
 def cv_auc(X, y, groups, folds=5, seed=0, C=0.01):

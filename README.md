@@ -144,7 +144,10 @@ Tooling (`src/cot_controllability/whitebox/`, CLI `cot-whitebox`, dependency gro
   [public](https://huggingface.co/solarkyle/jspace-lenses)) and of the logit lens;
 - `probe` and `lens` report probe AUCs against the baselines and lens tokens of leak vs kept.
 
-`extract`, `probe` and `lens` are written but not yet run on the GPU.
+`extract`, `probe` and `lens` are covered by offline tests on a tiny random Qwen3.5 and were run end to
+end on Qwen3.5-0.8B (same architecture and tokenizer) on 20 v3 traces on a laptop CPU; not yet on
+Qwen3.6-27B. On the GPU, install `flash-linear-attention` and `causal-conv1d`, or the linear-attention
+blocks fall back to a slow PyTorch implementation.
 
 The GPU run needs the vLLM server stopped (the 27B model takes about 54 GB of the A100's 80 GB).
 

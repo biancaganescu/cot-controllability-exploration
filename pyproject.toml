@@ -21,6 +21,7 @@ plots = [
 whitebox = [
     "torch>=2.6",
     "transformers>=4.57",
+    "accelerate>=1.2",  # device_map="auto" when loading the model
     "safetensors>=0.5",
     "scikit-learn>=1.6",
     "jlens @ git+https://github.com/anthropics/jacobian-lens",

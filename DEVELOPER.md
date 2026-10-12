@@ -107,6 +107,9 @@ Only `run` and `check` need network access; everything else is offline.
 | `uv run cot-unpack [PATH]` | Write readable `.json` copies of `.json.gz` files | free |
 | `uv run python scripts/secret_file/analysis/v1.py DIR [--check SUMMARY]` | Pre-registered analysis of a v1 run (`analysis/v2.py` for v2) | free |
 | `uv run --group plots python scripts/secret_file/plots/v1.py` | Redraw `docs/experiments/v1/figures/test/` | free |
+| `uv run --group whitebox cot-whitebox check RUN` | Replay a run through the chat template; prompts must match vLLM's token counts | free |
+| `uv run --group whitebox cot-whitebox extract RUN --out PATH [--model M] [--tokenizer T] [--lens L] [--layers 0:64:4] [--limit N]` | Residuals and lens top-k at the decision points | GPU for 27B; a laptop CPU runs Qwen3.5-0.8B |
+| `uv run --group whitebox cot-whitebox probe PATH` / `lens PATH` | Probe AUCs with baselines / lens tokens of leak vs kept | free |
 
 All scripts: [scripts/README.md](scripts/README.md).
 
