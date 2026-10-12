@@ -29,12 +29,28 @@ of the key.
 
 ## Where we are
 
-| | |
-| --- | --- |
-| Qwen3-8B, then Qwen3.6-27B on `train` and `validation` | done |
-| Scoring checked against 70 hand-labelled trajectories | done |
-| Plan frozen (`experiment-v1`); held-out `test` run on Qwen3.6-27B | **done** — black-box part closed |
-| White-box (looking inside the model) | next |
+### Black-box: what the model writes — done
+
+| Iteration | What | Status |
+| --- | --- | --- |
+| [1](docs/results-iteration-1.md) | Qwen3-8B, 13 conditions: understands every instruction, follows none in its thinking | done |
+| [2](docs/results-iteration-2.md) | louder observer on 8B; first Qwen3.6-27B run; scoring checked against 70 hand-labelled trajectories | done |
+| [3](docs/results-iteration-3.md) | Qwen3.6-27B, 25 conditions, 160 attempts each; predictions P1–P3 | done |
+| [test](docs/results-test.md) | plan frozen (`experiment-v1`); held-out run, 320 attempts per condition | **done** |
+
+### White-box: what happens inside the model — next
+
+All on Qwen3.6-27B, reusing the black-box trajectories (the `train` and `validation` splits are
+free to use; `test` stays for the final check).
+
+| Step | Question | Method |
+| --- | --- | --- |
+| W1 | How do *intrinsic* and *instructed* suppress the key inside the model? Is the instruction a late, word-specific filter in the last layers (as in [interp-cot-control](https://github.com/danorel/interp-cot-control) on Qwen3-8B)? | logit lens / per-layer probability of the key's next characters at the positions where it is written or skipped, by condition |
+| W2 | Can we tell, before the key appears, that it is about to be written? | linear probe on activations; labels from the leak positions the scorer already finds |
+| W3 | Does the model "know" about the secret or the observer when its thinking says nothing ("says vs does" inside the model)? | Oracle Lens / NLAs on positions just before the key or where the thinking is silent; private condition as baseline, manual checks against hallucinated explanations |
+
+W1 and W2 are mini-project size; W3 is sprint size and depends on open meta-models for
+Qwen3.6-27B.
 
 ## What we found (Qwen3.6-27B, held-out `test`, 320 attempts per condition)
 
@@ -81,8 +97,7 @@ be true; the wording of the instruction decides which one you get.
 
 ## Next
 
-1. White-box on Qwen3.6-27B: when the model writes the key, is the instruction still represented
-   inside it? Can a probe tell, before the key appears, that it is about to be written?
+1. White-box W1–W3 (see [Where we are](#white-box-what-happens-inside-the-model--next)).
 2. Check the wording effect directly: our task with the key quoted in the instruction, and
    Bianca's task without it.
 3. Generalise: more scenarios and secret types, a secret the task partly needs, other models.
