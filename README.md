@@ -7,7 +7,8 @@ its own reason (*intrinsic*) than when it is told (*instructed*)?
 - Where it started: Bianca's slides, [Can models control their reasoning for their own reasons?](docs/presentation.pdf) (Kimi K3, intrinsic vs instructed)
 - How to run it: [DEVELOPER.md](DEVELOPER.md)
 - Design, hypotheses, predictions: [docs/experiment-plan.md](docs/experiment-plan.md)
-- Full tables: [iteration 1](docs/results-iteration-1.md) · [iteration 2](docs/results-iteration-2.md) · [iteration 3](docs/results-iteration-3.md)
+- **Final results: [held-out test](docs/results-test.md)**
+- Exploration: [iteration 1](docs/results-iteration-1.md) · [iteration 2](docs/results-iteration-2.md) · [iteration 3](docs/results-iteration-3.md)
 
 ## The experiment
 
@@ -32,38 +33,43 @@ of the key.
 | --- | --- |
 | Qwen3-8B, then Qwen3.6-27B on `train` and `validation` | done |
 | Scoring checked against 70 hand-labelled trajectories | done |
-| Plan frozen (`experiment-v1`); held-out `test` run on Qwen3.6-27B | running |
+| Plan frozen (`experiment-v1`); held-out `test` run on Qwen3.6-27B | **done** — black-box part closed |
 | White-box (looking inside the model) | next |
 
-## What we found (Qwen3.6-27B, 160 attempts per condition)
+## What we found (Qwen3.6-27B, held-out `test`, 320 attempts per condition)
 
 | What the model is told | Writes the key in its thinking (visible / private) |
 | --- | --- |
-| nothing | 98% / 93% |
-| the stakes only (*intrinsic*) | 85% / 89% |
-| **"don't write the key"** (*instructed*) | **31% / 40%** |
-| "not in your reasoning" | 55% / 71% |
-| "write `[KEY]` instead" | 64% / 72% |
+| nothing | 97% / 96% |
+| the stakes only (*intrinsic*) | 71% / 82% |
+| **"don't write the key"** (*instructed*) | **36% / 48%** |
+| "not in your reasoning" | 70% / 78% |
+| "write `[KEY]` instead" | 69% / 78% |
 | *public ID, nothing to hide* | 100% / 100% |
 
-Accuracy is 100% everywhere (guessing: 50%), so instructions cost nothing.
+Accuracy is 100% everywhere (guessing: 50%), so instructions cost nothing. All findings below
+first appeared on `validation` and held on new customers and new wording.
 
-1. **Instructed control works; intrinsic barely does.** Being told "don't write it" cuts leaks by
-   about 60 points. Knowing the stakes while being watched helps only a little (85% vs 89%) — the
-   same as Bianca found for Kimi K3 (78% vs 83%).
-2. **It decides too late.** When it decides on its own to protect the key, 80% of the time it does
-   so *after* writing it (Bianca's Kimi K3: 87%). With an instruction, most decide before.
-3. **It guards its reply, not its thinking.** The rules it states are about its reply ("I must not
-   include the API key in my reply") — never about its thinking alone.
-4. **Aiming the rule at the thinking backfires.** "Not in your reasoning" leaks more than a plain
-   "don't write it", and the `[KEY]` placeholder is mostly ignored.
-5. **It reads everything anyway.** It always reads the whole key, even when it notes it could read
-   only the prefix — it controls what it writes, not what it reads.
+1. **Instructed control works much better than intrinsic.** "Don't write it" cuts leaks by about
+   55 points; the stakes alone by about 20, and how much depends on the wording — the closer the
+   stakes come to a rule, the more they help (train 52–69%, validation 85–89%, test 71–82%). Bianca
+   found the same gap for Kimi K3 (78% vs 83%).
+2. **Being watched helps only together with an instruction.** With an instruction, the model leaks
+   12 points less when the partner reads its thinking; with nothing said, being watched changes
+   nothing. Qwen3-8B shows no such effect.
+3. **It often decides too late.** When it decides on its own to protect the key, 52–80% of the time
+   it does so *after* writing it (Bianca's Kimi K3: 87%). With an instruction, most decide before.
+4. **It guards its reply, not its thinking.** The rules it states are about its reply ("I must not
+   share the API key") or reply and thinking together — never about its thinking alone.
+5. **Aiming the rule at the thinking backfires.** "Not in your reasoning" and "write `[KEY]`" leak
+   about 31 points more than a plain "don't write it".
+6. **It reads everything anyway.** It reads the whole key in 96–100% of attempts — it controls what
+   it writes, not what it reads.
 
 Qwen3-8B (iteration 1) understands every instruction but follows none of them in its thinking.
 
-All of this is exploratory (`train`/`validation`, one invented scenario). The `test` run checks it
-on new customers and new wording.
+Limits: one invented scenario, one model family, one kind of secret, and a secret the task does not
+need. See the plan's [Limitations](docs/experiment-plan.md#limitations).
 
 ## How this relates to Bianca's results
 
@@ -75,8 +81,8 @@ be true; the wording of the instruction decides which one you get.
 
 ## Next
 
-1. Analyse `test` with the pre-registered script and close the black-box part.
+1. White-box on Qwen3.6-27B: when the model writes the key, is the instruction still represented
+   inside it? Can a probe tell, before the key appears, that it is about to be written?
 2. Check the wording effect directly: our task with the key quoted in the instruction, and
    Bianca's task without it.
-3. White-box: when the model writes the key, is the instruction still represented inside it? Is
-   "reply" vs "thinking" something we can find in its activations?
+3. Generalise: more scenarios and secret types, a secret the task partly needs, other models.

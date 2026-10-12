@@ -205,6 +205,25 @@ These are written after seeing `train` and `validation` and before any `test` da
 - **Reproducibility is statistical.** Seeds are fixed per case and sample, but vLLM batching makes
   reruns differ token by token; conclusions rest on aggregates and CIs, not on identical reruns.
 
+## Outcome on `test` (checked 2026-10-12; tables in `docs/results-test.md`)
+
+Qwen3.6-27B, 320 trials per condition, all 8,000 answered. O1 (`read_full_secret`) is at ceiling
+(96–100%) in every condition, so every verdict is on O2 (`secret_in_reasoning`).
+
+- **H1 supported.** `instructed − intrinsic` −34.5 points [−40.6, −28.3]; negative for both test
+  paraphrases (−47.2, −21.9).
+- **H2 partly supported.** Negative at `intrinsic` (−10.9), `instructed` (−11.3) and `both` (−9.1),
+  CIs excluding 0; +0.6 [−2.2, +3.4] at `none`. Pooled −7.7 [−11.3, −4.1], and no level goes the
+  other way.
+- **H3 supported.** Routing ID in reasoning 100%; `key − routing` at `none` −3.4 [−5.3, −1.9] —
+  close to 0, protection appears only with a reason or a directive. Controls: `public − placebo`
+  +2.5 [−0.6, +5.3]; off-target −4.1 and −1.9.
+- **H4 supported.** Directive conditions −12.2 [−16.5, −7.9]; `none` +0.6 [−2.2, +3.4].
+- **P1 not met** (−2.5 [−7.8, +2.7]), **P2 met** (73% vs 38%), **P3 met** (−7.7 vs 8B −0.6).
+- **Manipulation check passed** for the core conditions: every parsed answer matched; rates below
+  90% (`private-none` 84%, `placebo-none` 88%) come only from unparsed answers. Lowest:
+  `private-placeholder` "must not write the API key" 53%, `private-reasoning_only` 66%.
+
 ## Analysis
 
 Unit: trial (case × condition × sample). Outcomes that are unknown (missing, truncated,
@@ -272,6 +291,13 @@ missed; such results are reported with their CIs rather than as nulls.
 - Self-hosted models run with fixed seeds; OpenRouter runs are not seeded.
 
 ## Deviations
+
+- **2026-10-12, analysis of `test`:** the frozen script (`scripts/analyze_run.py` at
+  `experiment-v1`) reports 95% cluster-bootstrap CIs with 4,000 resamples; the Holm correction, the
+  mixed-effects regression and the A/A calibration described under Analysis were not implemented
+  before the freeze and were not run. Verdicts use the CIs as reported. The rule-vs-leak timing in
+  `docs/results-test.md` uses the same ad-hoc sentence-level code as for `validation`; it is
+  descriptive.
 
 - **2026-10-11, before `test`:** `test` is run on Qwen3.6-27B only. Qwen3-8B did not act on any
   instruction on `train`/`validation` (iteration 1 and the salient run), so a `test` run would
