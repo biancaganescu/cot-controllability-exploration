@@ -23,7 +23,7 @@ CoT.
 We ran this in four made-up businesses (shipping, cloud storage, payments, a CRM), with new customers
 each time, six phrasings of every sentence, and 192–240 runs per condition.
 
-![How often the model leaks the key in its CoT, by what it is told](docs/experiments/v2/figures/main/leak_by_condition.png)
+![Only keeping the secret out of what it reads gets leaks near zero](docs/experiments/v3/figures/main/summary.png)
 
 ## What we found
 
@@ -40,8 +40,8 @@ each time, six phrasings of every sentence, and 192–240 runs per condition.
 4. **How the instruction is framed matters.** "Keep the API key out of everything you write" leaks
    in 56% of runs, against 71% for "do not share the API key with the partner" on the same customers
    — the best result short of telling the model what to read.
-5. **It protects its answer, not its CoT.** The key almost never appears in the final answer (6 of
-   1,680 runs). When the model reminds itself of a rule, the rule is usually about the answer — and
+5. **It protects its answer, not its CoT.** The key almost never appears in the final answer (10 of
+   3,408 runs). When the model reminds itself of a rule, the rule is usually about the answer — and
    often comes after the key is already in its CoT.
 6. **Controlling what it reads works; controlling what it writes does not.** "Read only the first 4
    characters of the key file" was followed in almost every run — so the model never saw the secret
@@ -54,7 +54,10 @@ each time, six phrasings of every sentence, and 192–240 runs per condition.
   monitors. But a simple instruction can make the model leave things out of its CoT almost half of
   the time, so it is worth checking what the model *read*, not only what it wrote.
 - **For people building AI agents:** do not count on the model to keep secrets out of its CoT. Give
-  it only the information it needs.
+  it only the information it needs — or tell it exactly what to read, which it follows.
+- **For people writing prompts:** if a secret must stay in context, frame the instruction around the
+  model's own writing ("keep it out of everything you write") and say plainly that its reasoning is
+  read. Even then, expect it in the CoT about half of the time.
 
 ## Caveats
 
@@ -63,8 +66,11 @@ single sentence is reworded, so the comparisons matter more than the precise fig
 
 ## Next
 
-Look inside the model to see what changes when it is told its reasoning is read, and whether we can
-predict — before it happens — that the model is about to leak the secret.
+Look inside the model at the moment just before it writes the secret: does it represent that this
+breaks the rule, what is it disposed to say, and can a simple classifier on its internal state
+predict the leak before it happens? We will read its internal state with a lens that translates it
+into words and test what we find against controls, because the rule is always in the prompt and a
+method can simply read it back.
 
 *More detail: [README](README.md) · full results: [main experiment](docs/experiments/v2/results/main.md),
 [follow-ups](docs/experiments/v3/results/main.md) ·

@@ -112,7 +112,8 @@ def per_condition_n(rows):
     return max(n.values()), max(per_env.values())
 
 
-def leak_by_condition(rows, out):
+def leak_by_condition(rows, out, title='How often the model leaks the key, by what it is told',
+                      note=None, name='leak_by_condition.png'):
     """The headline: one bar per condition, all environments pooled, labelled with k / n."""
     items = layout(rows)
     fig, ax = plt.subplots(figsize=(6.4, 0.34 * len(items) + 1.3))
@@ -136,10 +137,9 @@ def leak_by_condition(rows, out):
     ax.grid(axis='x', color=GRID, lw=0.6)
     ax.set_axisbelow(True)
     n, n_env = per_condition_n(rows)
-    header(ax, 'How often the model leaks the key, by what it is told',
-           f'All four environments; {n} attempts per condition ({n_env} per environment). Line = 95% CI.')
-    footnote(ax, TEXT['condition_note'])
-    fig.savefig(out / 'leak_by_condition.png')
+    header(ax, title, f'All four environments; {n} attempts per condition ({n_env} per environment). Line = 95% CI.')
+    footnote(ax, note or TEXT['condition_note'])
+    fig.savefig(out / name)
     plt.close(fig)
 
 
@@ -287,26 +287,34 @@ def reading(rows, out):
     plt.close(fig)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument('runs', nargs='+', help='v2 run directories (pooled)')
-    parser.add_argument('--check', nargs='*', default=[], help='manipulation-check directories of the same customers')
-    parser.add_argument('--out', type=Path, default=Path('docs/experiments/v2/figures'))
-    args = parser.parse_args()
-    args.out.mkdir(parents=True, exist_ok=True)
+def parser():
+    p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument('runs', nargs='+', help='run directories (pooled)')
+    p.add_argument('--check', nargs='*', default=[], help='manipulation-check directories of the same customers')
+    p.add_argument('--out', type=Path, default=Path('docs/experiments/v2/figures'))
+    return p
+
+
+def render(runs, checks, out):
+    out.mkdir(parents=True, exist_ok=True)
     style()
     rows = []
-    for run in args.runs:
+    for run in runs:
         part = sf.score_run(run)['trials']
         add_decisions(Path(run), part)
         rows += part
-    leak_by_condition(rows, args.out)
-    leak_by_environment(rows, args.out)
-    contrasts(rows, args.out)
-    knows_vs_does(rows, args.check, args.out)
-    rule_timing(rows, args.out)
-    reading(rows, args.out)
-    print('wrote', ', '.join(sorted(p.name for p in args.out.glob('*.png'))))
+    leak_by_condition(rows, out)
+    leak_by_environment(rows, out)
+    contrasts(rows, out)
+    knows_vs_does(rows, checks, out)
+    rule_timing(rows, out)
+    reading(rows, out)
+    print('wrote', ', '.join(sorted(p.name for p in out.glob('*.png'))))
+
+
+def main():
+    args = parser().parse_args()
+    render(args.runs, args.check, args.out)
 
 
 if __name__ == '__main__':
