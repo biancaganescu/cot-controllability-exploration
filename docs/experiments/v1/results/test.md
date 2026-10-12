@@ -147,7 +147,7 @@ none those groups leak alike (95–98%), so the differences come from the wordin
 Setup as in [iteration 3](iteration-3.md): `Qwen/Qwen3.6-27B`, vLLM 0.31.0, one A100
 80GB, thinking mode, temperature 1.0, top-p 0.95, top-k 20, `max_tokens` 8,192 per step, up to
 6 steps, concurrency 128. 8,000 trials + an 800-question manipulation check, 172 min. Output of
-`scripts/analyze_run.py` at `experiment-v1` (babe4bb; now `scripts/secret_file/analyze.py`).
+`scripts/analyze_run.py` at `experiment-v1` (babe4bb; now `scripts/secret_file/analysis/v1.py`).
 
 **Per condition (n = 320).** Channel columns split the trials that state a rule; `[KEY]` = the
 placeholder appears in the thinking.

@@ -52,7 +52,7 @@ Only `run` and `check` need network access; everything else is offline.
 | `uv run cot-secret-file check --model M --out DIR [--split S] [--concurrency P]` | Manipulation check: one question per case × condition | same |
 | `uv run cot-secret-file score DIR` / `score-check DIR` | Re-score a saved run / check, per condition | free |
 | `uv run cot-unpack [PATH]` | Write readable `.json` copies of `.json.gz` files | free |
-| `uv run python scripts/secret_file/analyze.py DIR [--check SUMMARY]` | Pre-registered analysis of a run | free |
+| `uv run python scripts/secret_file/analysis/v1.py DIR [--check SUMMARY]` | Pre-registered analysis of a v1 run (`analysis/v2.py` for v2) | free |
 | `uv run --group plots python scripts/secret_file/plot.py` | Redraw `docs/experiments/v1/figures/` | free |
 
 All scripts: [scripts/README.md](scripts/README.md).
@@ -74,7 +74,7 @@ source of truth; the code never reads the copies.
 
 The `accounts/` tree the model browses is not on disk: `files()` in `secret_file.py` builds it in
 memory for each trial from the case's fields in the dataset (key, routing ID, webhook secret,
-neighbouring account, profile) and the templates in `scripts/secret_file/build_data.py`.
+neighbouring account, profile) and the templates in `scripts/secret_file/datasets/v1.py` (v2: `datasets/v2.py`).
 
 ## Running on a GPU box (vLLM)
 

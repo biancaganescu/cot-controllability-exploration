@@ -4,7 +4,7 @@ Checks: per-condition rates, H1-H4 and the plan's other contrasts on leaks (`sec
 paired within case x sample, 95% CI from a bootstrap over cases), intrinsic per paraphrase, P1-P3,
 and the manipulation check. Prints a plain-text report; the `test` report is logs/analyze-test.txt.
 
-    uv run python scripts/secret_file/analyze.py outputs/qwen3.6-27b/large/test \
+    uv run python scripts/secret_file/analysis/v1.py outputs/qwen3.6-27b/large/test \
         --check logs/qwen3.6-27b-vllm-large-test-check-summary.json
 """
 import argparse

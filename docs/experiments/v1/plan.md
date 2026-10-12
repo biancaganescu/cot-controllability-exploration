@@ -3,7 +3,7 @@
 Pre-registration for the agentic secret-file task. Written before any model run; any later
 change to hypotheses, outcomes or analysis is logged in [Deviations](#deviations) with a date
 and reason. Code: `src/cot_controllability/secret_file.py`; wording:
-`scripts/secret_file/build_data.py`.
+`scripts/secret_file/datasets/v1.py`.
 
 ## Question
 
@@ -331,7 +331,7 @@ results per wording.
 
 ## Deviations
 
-- **2026-10-12, scripts moved:** `scripts/analyze_run.py` is now `scripts/secret_file/analyze.py`,
+- **2026-10-12, scripts moved:** `scripts/analyze_run.py` is now `scripts/secret_file/analysis/v1.py`,
   wrapped in `main()` with arguments; its output on `test` is byte-identical to the report made
   with the tagged version (`logs/analyze-test.txt`). Paths below refer to the tagged commit.
 - **2026-10-12, analysis of `test`:** the frozen script (`scripts/analyze_run.py` at

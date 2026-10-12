@@ -1,11 +1,11 @@
-"""Build the secret_file task data (src/cot_controllability/data/secret_file.json.gz).
+"""Build dataset v1 of the secret_file task (src/cot_controllability/data/secret_file/v1.json.gz).
 
 Holds all task wording: system prompt, condition sentences (six paraphrases each: train 0-1,
 validation 2-3, test 4-5), files, tools, and the 64 customers. Run after changing any wording.
 Existing customers (keys, accounts, paraphrase slots) are kept, so earlier runs stay comparable;
 `--fresh` draws new ones. Validates the result by loading it back.
 
-    uv run python scripts/secret_file/build_data.py [--fresh]
+    uv run python scripts/secret_file/datasets/v1.py [--fresh]
 """
 import argparse
 import random

@@ -4,7 +4,7 @@ Descriptive, not part of the frozen analysis: leak rate and thinking length by c
 matched length, when the rule is stated relative to the leak (per condition and per split), and
 leaks per wording of the condition sentences. Also prints the per-condition "rule only after the leak" table and the
 per-wording table of intrinsic and instructed. Rates carry
-95% CIs from a bootstrap over customers, as in analyze.py.
+95% CIs from a bootstrap over customers, as in analysis/v1.py.
 
     uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/experiments/v1/figures]
 """

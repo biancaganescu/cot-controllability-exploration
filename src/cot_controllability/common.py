@@ -101,7 +101,7 @@ def unpack(path=DATA_DIR):
     Returns `(target, written)` pairs; up-to-date copies are skipped.
     """
     path = Path(path)
-    sources = sorted(path.glob('*.json.gz')) if path.is_dir() else [path]
+    sources = sorted(path.rglob('*.json.gz')) if path.is_dir() else [path]
     if not sources:
         raise ValueError('No .json.gz files found')
     results = []
