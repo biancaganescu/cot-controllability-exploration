@@ -29,7 +29,8 @@ The partner either reads the thinking live (**visible**) or not (**private**).
 4. **Visible helps only once the model is told something**: −12 points visible vs private under
    the instructed conditions (H4, pre-registered after validation), 0 under none.
 5. **Not a length or capability artefact.** Accuracy is 100% everywhere; instructed thinking is
-   slightly *longer*; leak gaps hold at matched length. It still reads the whole key in 96–100%.
+   slightly *longer*; leak gaps hold at matched length. It almost never limits what it reads (19 of 7,360 partial reads), though no
+   condition asks it to.
 
 **What it means.** Without an instruction, the content of the thinking is close to an
 unfiltered restatement of what the model reads: good for monitoring. With a plain instruction, a

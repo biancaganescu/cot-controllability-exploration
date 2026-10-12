@@ -84,8 +84,9 @@ below first appeared on `validation` and held on new customers and new wording.
    share the API key") or reply and thinking together — never about its thinking alone.
 5. **Aiming the instruction at the thinking backfires.** Reasoning-only and placeholder leak about
    31 points more than instructed.
-6. **It reads everything anyway.** It reads the whole key in 96–100% of attempts — it controls what
-   it writes, not what it reads.
+6. **It never limits what it reads on its own.** Only 19 of 7,360 attempts read just part of the key
+   (`offset`/`length`), even under intrinsic; 21 of the 27 that think "I only need the prefix" still
+   read it all. No condition asks it to read less, so this shows its default, not an inability.
 
 More figures (thinking length, leaks at matched length, every condition by rule timing): [held-out
 test results](docs/results-test.md#figures).
@@ -110,6 +111,8 @@ be true; the wording of the instruction decides which one you get.
 2. Check the wording effect directly: our task with the key quoted in the instruction, and
    Bianca's task without it.
 3. Generalise: more scenarios and secret types, a secret the task partly needs, other models.
+4. Test control over reading: a condition that asks it to read only what it needs ("read just the
+   key's prefix"), to tell whether it cannot limit its reads or simply never does.
 
 **Before reusing this dataset for more black-box runs:** cross the wordings with the customers and
 rewrite intrinsic without "not the key" — today each split has two non-equivalent wordings, so
