@@ -9,8 +9,9 @@
 - **Visible helps only once the model is told something** — H4, added after validation, now
   confirmed: under the instructed conditions visible leaks 12 points less than private; under none,
   no difference. On `test` intrinsic shows the gap too (11 points), unlike on `validation`.
-- **Aiming the instruction at the thinking backfires again.** Reasoning-only and placeholder leak
-  about 31 points more than instructed.
+- **Instructions aimed at the thinking work worse, again.** Reasoning-only and placeholder leak about
+  31 points more than instructed (still about 20 fewer than none); their manipulation check failed
+  (53–66%), so by the plan's rule they count as untested.
 - **It still often decides too late.** Under intrinsic, 50% of the rules it states come *after* the
   leak (validation: 83%). The test wording of intrinsic reads more like a rule, so the model states
   one more often and earlier.

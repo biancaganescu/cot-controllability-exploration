@@ -64,8 +64,9 @@ the partner learn it?" — **yes in 142 of 142** answers (283 of 283 over smoke 
 - **A2: naming the channel helps a reason.** Fewer leaks in both stages (−33 and −17 points).
 - **A1: naming the channel does not help an instruction.** Both stages point the other way from the
   prediction: the instruction without "in your reasoning" leaks no more, possibly less.
-- **Knowing is not doing.** The model always says its reasoning would reveal the key, and with only a
-  reason it still writes the key in 46 of 48 attempts over the two stages.
+- **It can infer, but does not apply.** Asked in a separate conversation, the model always says its
+  reasoning would reveal the key; with only a reason it still writes the key in 46 of 48 attempts
+  over the two stages.
 
 ### read_limit: the model does not notice it
 
@@ -98,11 +99,12 @@ What it does show:
 
 1. **A3's zero is not inability.** The model uses `offset` and `length` perfectly when told exactly
    what to read. It fails to turn a goal ("read only what you need") into that action.
-2. **An action is easier to control than generation.** A concrete instruction about one tool call is
-   followed in 24 of 24 attempts. A clear instruction about the model's own text ("do not share the key,
-   in your reasoning or in your replies") is followed in only 6 of 24. So unclear wording alone does
-   not explain the leaks: keeping one's own text in check while generating it looks harder than
-   choosing one parameter of one tool call.
+2. **A concrete procedure is followed; a principle is not.** "Read only the first 4 characters" is
+   followed in 24 of 24 attempts; "read only what you need" in 1 of 24. A clear but general
+   instruction about the model's own text ("do not share the key, in your reasoning or in your
+   replies") keeps the key out in only 6 of 24. Whether an equally *concrete* instruction about
+   writing would do as well as the one about reading is untested, so this does not yet separate
+   actions from generation.
 3. **The most reliable protection is upstream.** A secret that is never read cannot leak.
 
 ## What `main` showed

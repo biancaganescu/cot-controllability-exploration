@@ -10,8 +10,8 @@
   already written it — the same as Bianca found for Kimi K3 (87%).
 - **It guards its reply, not its thinking.** Its stated rules are about the reply, or reply and
   thinking together — never about the thinking alone.
-- **Aiming the instruction at the thinking backfires.** Reasoning-only leaks more than instructed,
-  and placeholder is mostly ignored.
+- **Instructions aimed at the thinking work worse.** Reasoning-only leaks more than instructed, and
+  placeholder is mostly ignored (both still leak less than none).
 - **Visible helps only together with an instruction** — a small effect we did not predict; the
   `test` run checks it.
 - Accuracy 100% everywhere; it always reads the whole key and never refuses.
