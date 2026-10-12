@@ -8,7 +8,8 @@ too (B2)? does framing the instruction around the model's own output protect bet
 concrete instruction about what to *write* work like the one about what to read (B4)? Stages smoke →
 small → main. **Done.** Emphasis does a little (−8 points), the reasoning sentence much more
 (−30); adding it to an instruction barely helps (−6); "keep it out of everything you write" beats "do
-not share with the partner" (56% vs 71%); "write only the first 4 characters" is ignored (84%).
+not share with the partner" (56% vs 71%; the pair differs in verb, scope and addressee); a precise
+format instruction about writing is followed in 16% of attempts, the same about reading in 99.5%.
 
 | Document | What is in it |
 | --- | --- |
