@@ -98,9 +98,11 @@ with 320 attempts per condition.
   only its first 4 characters in your reasoning" is followed in 16% of attempts (84% leak), "read only
   the first 4 characters" in 99.5%. Neither forbids anything, so concreteness is not why read_exact
   works — keeping the secret out of the context is.
-- **The pair "do not share" / "keep it out of everything you write" differs in three things at once**
-  (verb, scope, addressee), and every v3 condition is visible, so v3 does not show whether the better
-  wording uses the knowledge that the thinking is read or is a broader ban.
+- **The better wording is mostly a broader ban.** In an exploratory private run on the same customers,
+  "keep it out of everything you write" still beats "do not share" (−9 points; −15 when visible); the
+  interaction (+6, CI −5 to +17) is not distinguishable from 0. Both leak a little more when nobody
+  reads the thinking. The pair differs in verb, scope and addressee at once, so which of these matters
+  is still open.
 - **v2's wording split did not replicate:** the reason wording under which the sentence "did nothing"
   in v2 gives −31 points on new customers (each v2 customer had one wording, so a customer effect
   explains it). What replicates: under that wording the model's rule is more often about the reply.

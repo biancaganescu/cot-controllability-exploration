@@ -38,8 +38,8 @@ sentence. The numbers below are from that run.
    the reason brings leaks to 65%. Adding "this key is highly sensitive" instead brings them only to
    86%.
 4. **How the instruction is worded matters.** "Keep the API key out of everything you write" leaks in
-   56% of runs, "do not share the API key with the partner" in 71%. The two differ in more than one
-   way (the verb, "everything", the partner), so which part matters is still open.
+   56% of runs, "do not share the API key with the partner" in 71%. It is mostly a broader ban: when
+   the partner cannot read the CoT, the better wording still wins (68% vs 77%).
 5. **It protects its answer, not its CoT.** The key reaches the final answer in 4 of 1,728 runs. When
    the model reminds itself of a rule, the rule is usually about the answer — and often comes after
    the key is already in its CoT.
@@ -62,9 +62,7 @@ sentence. The numbers below are from that run.
 ## Caveats
 
 One model, one kind of secret, and an easy task. The exact numbers shift by up to 30 points when a
-single sentence is reworded, so the comparisons matter more than the precise figures. Every result
-here is from runs where the partner reads the CoT; whether the better instruction works *because*
-the model knows it is read is not yet tested.
+single sentence is reworded, so the comparisons matter more than the precise figures.
 
 ## Next
 

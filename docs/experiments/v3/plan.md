@@ -96,6 +96,12 @@ the former, the advantage should shrink when the partner cannot read the thinkin
 **Danyil's prediction:** "keep it out of everything you write" does not lose more in private than "do
 not share"; the broader ban is what works (interaction ≈ 0).
 
+**Outcome** (tables in [results/main.md](results/main.md#exploratory-the-same-two-instructions-in-private)):
+mostly as predicted. In private "keep it out of everything you write" still beats "do not share" (−9
+points [−17, −1]; public −15), so most of its advantage is the broader ban. The interaction is +6
+[−5, +17]: not distinguishable from 0, but the run cannot rule out that up to about a third of the
+advantage depends on the thinking being read. Both instructions leak more in private (+5 and +12).
+
 ## Deviations
 
 - **2026-10-12, B4 in the Holm family.** `analysis/v3.py` put write_exact − instructed (predicted < 0)
