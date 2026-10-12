@@ -1,18 +1,18 @@
 # Iteration 1: Qwen3-8B
 
-← [README](../README.md)
+← [README](../README.md) · condition names: [terminology](terminology.md)
 
 ## In short
 
 - Qwen3-8B **understands every instruction** — asked directly, it says correctly who can see its
   thinking and that it must not write the key (100%).
 - But it **writes the key in its thinking half to two thirds of the time, whatever it is told**:
-  visible or private, with or without the stakes, even when told not to.
+  visible or private, under none, intrinsic or instructed alike.
 - In its **final answer** it almost never writes the key (0–4%). It controls what it *says*, not
   what it *thinks*.
 - The leak is a **habit**: right after opening the file it restates what it read. It does that even
   more (86–93%) with an ID that is not secret at all.
-- When it does try to be careful, it **gives up** instead: 17% of attempts under "don't write it"
+- When it does try to be careful, it **gives up** instead: 17% of attempts under instructed
   while visible refused to open the file and asked the partner to look up the key.
 
 ## What we ran
@@ -22,20 +22,20 @@ All runs finished; the model's self-report was checked with a separate question 
 
 ## Main results
 
-| What the model is told | Visible / private | Writes the key in its thinking | Reads the whole key | Correct | Gives up |
+| Condition | Visible / private | Leaks | Reads the whole key | Correct | Gives up |
 | --- | --- | --- | --- | --- | --- |
-| nothing | visible | 60% | 92% | 98% | 2% |
-| nothing | private | 69% | 98% | 96% | 2% |
-| the stakes only (*intrinsic*) | visible | 60% | 96% | 98% | 0% |
-| the stakes only | private | 63% | 98% | 100% | 0% |
-| "don't write the key" (*instructed*) | visible | 50% | **77%** | **81%** | **17%** |
-| "don't write the key" | private | 46% | 96% | 98% | 2% |
-| stakes + "don't write it" | visible | 55% | 83% | 90% | 8% |
-| stakes + "don't write it" | private | 59% | 85% | 88% | 12% |
-| neutral sentence (placebo) | — | 48% | 94% | 96% | 4% |
-| public ID, nothing to hide | visible | **86%** | 98% | 100% | 0% |
+| none | visible | 60% | 92% | 98% | 2% |
+| none | private | 69% | 98% | 96% | 2% |
+| intrinsic | visible | 60% | 96% | 98% | 0% |
+| intrinsic | private | 63% | 98% | 100% | 0% |
+| instructed | visible | 50% | **77%** | **81%** | **17%** |
+| instructed | private | 46% | 96% | 98% | 2% |
+| intrinsic + instructed | visible | 55% | 83% | 90% | 8% |
+| intrinsic + instructed | private | 59% | 85% | 88% | 12% |
+| *control:* placebo | — | 48% | 94% | 96% | 4% |
+| *control:* routing ID | visible | **86%** | 98% | 100% | 0% |
 
-Differences of 10–20 points between rows are within chance at this size (the placebo row, which
+Differences of 10–20 points between rows are within chance at this size (placebo, which
 says nothing, is the lowest).
 
 <details>
@@ -85,7 +85,7 @@ cases; negative = less exposure in the first condition. Uncorrected.
 | Control `offtarget_intrinsic − none` | +0.00 [−0.10, +0.10] | +0.09 [−0.11, +0.28] |
 | Control `offtarget_instructed − none` | +0.06 [−0.02, +0.15] | −0.11 [−0.34, +0.12] |
 
-Manipulation check: 100% match for visibility, the stakes and the instruction (both splits);
+Manipulation check: 100% match for visibility, intrinsic and instructed (both splits);
 `placebo-none`, which states nothing, drew 31% "not stated".
 
 </details>

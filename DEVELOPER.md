@@ -14,6 +14,7 @@ src/cot_controllability/secret_file.py             agentic secret-file runner / 
 src/cot_controllability/data/secret_token.json.gz  prompt template, cases, model profile
 src/cot_controllability/data/secret_file.json.gz   system/user templates, conditions, tools, cases
 scripts/make_secret_file_data.py                   all secret_file wording; regenerates its data (fresh keys)
+scripts/plot_results.py                            figures in docs/figures (uv run --group plots python scripts/plot_results.py)
 docs/experiment-plan.md                            secret_file design, hypotheses, analysis (pre-registration)
 configs/models/*.yaml                              one file per model: backend, sampling, options
 envs/vllm/                                         isolated vLLM env (own torch pins), GPU box only

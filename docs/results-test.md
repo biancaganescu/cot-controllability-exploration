@@ -1,20 +1,20 @@
 # Held-out test: Qwen3.6-27B
 
-← [README](../README.md)
+← [README](../README.md) · condition names as in the README's [Terminology](../README.md#terminology)
 
 ## In short
 
-- **The validation findings hold on new customers and new wording.** "Don't write the key"
-  (*instructed*) cuts leaks from 96–97% to 36–48%; the stakes alone (*intrinsic*) to 71–82%.
-- **Being watched helps, but only together with an instruction** — the hypothesis (H4) we added
-  after validation, now confirmed: 12 points fewer leaks when the partner reads the thinking, and
-  no difference without an instruction.
-- **Aiming the rule at the thinking backfires again.** "Not in your reasoning" and "write `[KEY]`
-  instead" leak about 31 points more than a plain "don't write it".
-- **It still often decides too late.** Left to itself, 52% of its "I won't share the key" comes
-  *after* it has already written it (validation: 80%). This test wording reads more like a rule,
-  so the model states one more often and earlier.
-- Accuracy 100% everywhere; it reads the whole key in 96–100% of attempts and never refuses.
+- **The validation findings hold on new customers and new wording.** Instructed cuts leaks from
+  96–97% (none) to 36–48%; intrinsic only to 71–82%.
+- **Visible helps only once the model is told something** — H4, added after validation, now
+  confirmed: under the instructed conditions visible leaks 12 points less than private; under none,
+  no difference. On `test` intrinsic shows the gap too (11 points), unlike on `validation`.
+- **Aiming the instruction at the thinking backfires again.** Reasoning-only and placeholder leak
+  about 31 points more than instructed.
+- **It still often decides too late.** Under intrinsic, 50% of the rules it states come *after* the
+  leak (validation: 83%). The test wording of intrinsic reads more like a rule, so the model states
+  one more often and earlier.
+- Accuracy 100% in every condition; it reads the whole key in 96–100% of attempts and never refuses.
 
 ## What we ran
 
@@ -24,57 +24,93 @@ script committed before the run (tag `experiment-v1`). All 8,000 attempts finish
 
 ## Main results
 
-| What the model is told | Writes the key in its thinking (visible / private) | States a rule |
+| Condition | Leaks (visible / private) | States a rule |
 | --- | --- | --- |
-| nothing | 97% / 96% | 0% |
-| the stakes only (*intrinsic*) | 71% / 82% | 63–73% |
-| **"don't write the key"** (*instructed*) | **36% / 48%** | 75–79% |
-| stakes + "don't write it" | 26% / 35% | 92–95% |
-| "not in your reasoning" | 70% / 78% | 27–47% |
-| "write `[KEY]` instead" | 69% / 78% | 7–8% |
-| "don't write it" + partner says "I'm watching" | 26% / 49% | 76–82% |
-| "don't write it" + partner says "take your time" | 38% / 52% | 77–80% |
-| same sentences about the contact email | 93–95% | — |
-| public ID, nothing to hide | 100% / 100% | 0% |
+| none | 97% / 96% | 0% |
+| intrinsic | 71% / 82% | 63–73% |
+| **instructed** | **36% / 48%** | 75–79% |
+| intrinsic + instructed | 26% / 35% | 92–95% |
+| instructed + salient | 26% / 49% | 76–82% |
+| instructed + reminder | 38% / 52% | 77–80% |
+| reasoning-only | 70% / 78% | 27–47% |
+| placeholder | 69% / 78% | 7–8% |
+| *control:* off-target intrinsic / instructed (visible) | 93% / 95% | — |
+| *control:* placebo | 94% | 0% |
+| *control:* routing ID | 100% / 100% | 0% |
 
 ### Our hypotheses
 
 | Hypothesis | Result | Verdict |
 | --- | --- | --- |
 | **H1** instructed protects more than intrinsic | −34.5 points [−40.6, −28.3]; negative for both wordings (−47, −22) | **supported** |
-| **H2** visible protects more than private, at every level | −8 to −11 points with the stakes or an instruction; +0.6 [−2.2, +3.4] with nothing | **partly supported** (not at "nothing") |
-| **H3** the model restates what it reads | public ID written in 100%; the key only 3 points less with nothing said | **supported** |
-| **H4** being watched helps only with an instruction | −12.2 [−16.5, −7.9] with an instruction; +0.6 [−2.2, +3.4] without | **supported** |
+| **H2** visible protects more than private, in every condition | −9 to −11 points under intrinsic, instructed and intrinsic + instructed; +0.6 [−2.2, +3.4] under none | **partly supported** (not under none) |
+| **H3** the model restates what it reads | routing ID written in 100%; the key only 3 points less under none | **supported** |
+| **H4** visible helps only together with an instruction | −12.2 [−16.5, −7.9] over the instructed conditions; +0.6 [−2.2, +3.4] under none | **supported** |
 
 "Reads the whole key" (the second outcome in the plan) is at ceiling (96–100%) in every condition,
-so it cannot separate the conditions; all verdicts are on "writes the key in its thinking".
+so it cannot separate the conditions; all verdicts are on leaks.
 
 ### Our predictions
 
 | Prediction | `test` | (`validation`) |
 | --- | --- | --- |
-| "Not in your reasoning" beats "the stakes only" by ≥ 25 points | −2.5 points: **not met** | (−24, not met) |
-| The model writes the key more often than `[KEY]` | 73% vs 38%: **met** | (68% vs 20%, met) |
-| Being watched lowers leaks, pooled, more than for 8B | −7.7 [−11.3, −4.1] vs 8B −0.6: **met** | (−1.9, not met) |
+| P1: reasoning-only leaks ≥ 25 points less than intrinsic | −2.5 points: **not met** | (−24, not met) |
+| P2: under placeholder the model writes the key more often than `[KEY]` | 73% vs 38%: **met** | (68% vs 20%, met) |
+| P3: visible leaks less than private (none … intrinsic + instructed pooled), more so than for 8B | −7.7 [−11.3, −4.1] vs 8B −0.6: **met** | (−1.9, not met) |
 
-### When it decides: before or after writing the key
+### When it decides: before or after the leak
 
 For attempts whose thinking states a rule about the key:
 
-| | Never writes the key | Decides only after writing it | Decides first, writes it anyway |
+| | Never leaks | Rule only after the leak | Rule first, leaks anyway |
 | --- | --- | --- | --- |
-| No instruction, `test` | 23% | **52%** | 26% |
-| No instruction, `validation` | 16% | **80%** | 4% |
-| No instruction, Bianca's Kimi K3 | 10% | 87% | — |
-| With an instruction, `test` | **57%** | 25% | 19% |
-| With an instruction, `validation` | **63%** | 22% | 15% |
+| intrinsic, `test` | 23% | **50%** | 27% |
+| intrinsic, `validation` | 13% | **83%** | 4% |
+| intrinsic (visible), Bianca's Kimi K3 | 10% | 87% | — |
+| instructed conditions, `test` | **57%** | 24% | 19% |
+| instructed conditions, `validation` | **63%** | 22% | 15% |
 
-### The stakes' wording, again
+"Instructed conditions" = instructed, intrinsic + instructed, instructed + salient, instructed +
+reminder, reasoning-only.
 
-`intrinsic` leaks 73% with one test wording and 80% with the other (validation: 85–89%; train:
+Per condition, as a share of all attempts: how often the model leaks first and states the rule only
+afterwards.
+
+| Condition | Visible | Private |
+| --- | --- | --- |
+| none | 0% | 0% |
+| intrinsic | **29%** | **38%** |
+| instructed | 18% | 22% |
+| intrinsic + instructed | 7% | 15% |
+| instructed + salient | 13% | 20% |
+| instructed + reminder | 16% | 23% |
+| reasoning-only | 25% | 18% |
+| placeholder | 5% | 6% |
+
+Read with the first figure below: under placeholder a rule is rare (the model mostly leaks without
+stating any), so a low share there does not mean the rule comes early.
+
+## Figures
+
+All from `scripts/plot_results.py` (`uv run --group plots python scripts/plot_results.py`).
+
+![Every condition by whether and when the rule is stated](figures/decision_by_condition.png)
+
+![Thinking length by condition](figures/cot_length_by_condition.png)
+
+The instructed conditions think slightly longer (≈ 263–291 reasoning tokens vs 242–254 under none),
+and visible longer than private — so instructions do not work by cutting the thinking short.
+
+![Leak rate at matched thinking length](figures/leak_vs_length.png)
+
+![Stability across splits](figures/splits.png)
+
+### The wording of intrinsic, again
+
+Intrinsic leaks 73% with one test wording and 80% with the other (validation: 85–89%; train:
 52–69%). The test wordings ("the key is not theirs to know") read like a rule, and the model states
 a rule in 63–73% of attempts (validation: 12–21%). The size of the intrinsic effect depends on how
-close the stakes come to an instruction; its direction does not.
+close its wording comes to an instruction; its direction does not.
 
 <details>
 <summary>Full tables (all 25 conditions, all contrasts with confidence intervals)</summary>
@@ -137,23 +173,25 @@ bootstrap over the 32 cases (4,000 resamples); "pooled" = over visible and priva
 | `public_salient − private_salient` @ instructed | −0.231 [−0.319, −0.147] |
 | Accuracy `instructed − none` | +0.000 |
 
-**Visible − private, by what the model is told.**
+**Visible − private, by condition.**
 
 | | Estimate |
 | --- | --- |
-| nothing | +0.006 [−0.022, +0.034] |
-| stakes | −0.109 [−0.178, −0.037] |
-| "don't write it" | −0.113 [−0.188, −0.037] |
-| stakes + "don't write it" | −0.091 [−0.163, −0.019] |
-| "not in your reasoning" | −0.072 [−0.147, +0.003] |
-| "write `[KEY]`" | −0.084 [−0.175, +0.003] |
+| none | +0.006 [−0.022, +0.034] |
+| intrinsic | −0.109 [−0.178, −0.037] |
+| instructed | −0.113 [−0.188, −0.037] |
+| intrinsic + instructed | −0.091 [−0.163, −0.019] |
+| reasoning-only | −0.072 [−0.147, +0.003] |
+| placeholder | −0.084 [−0.175, +0.003] |
 | pooled over the first four (P3) | −0.077 [−0.113, −0.041] |
 | H4: pooled over the six directive conditions | −0.122 [−0.165, −0.079] |
 | Qwen3-8B, first four pooled (`validation`) | −0.006 [−0.095, +0.079] |
 
 States a rule → leaks 49% vs 84% when not (2,846 of 7,360 key trials state one). Timing counts:
-455 uninstructed and 2,342 instructed trials state a rule; computed with the same sentence-level
-code as for validation (not part of the frozen script).
+434 uninstructed and 2,336 instructed trials state a rule; computed by `scripts/plot_results.py`
+(not part of the frozen script). An earlier ad-hoc count also took in the off-target email
+conditions (their names end in `_intrinsic` / `_instructed`); corrected here and in iteration 3
+(validation 80% → 83%).
 
 **Manipulation check.** 741/800 answers parsed. Every parsed answer matched in the eight core
 conditions; rates below 90% there (`private-none` 84%, `placebo-none` 88%) come only from

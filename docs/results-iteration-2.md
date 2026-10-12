@@ -1,35 +1,35 @@
-# Iteration 2: louder observer, first look at Qwen3.6-27B, checking our measurements
+# Iteration 2: salient on Qwen3-8B, first look at Qwen3.6-27B, checking our measurements
 
-← [README](../README.md)
+← [README](../README.md) · condition names: [terminology](terminology.md)
 
 ## In short
 
-- **A louder observer did not help Qwen3-8B.** Even when the partner writes "I can read your
+- **Salient did not help Qwen3-8B.** Even when the partner writes "I can read your
   reasoning in real time", it rarely mentions being watched (0–8%) and leaks as before.
 - **Our numbers were noisy.** Rerunning the same conditions moved leak rates by 10–23 points, so
   later runs use more samples.
-- **Qwen3.6-27B follows instructions.** On a small first run, "don't write the key" cut leaks from
-  100% to 12–25%. (The 50% it showed for "the stakes only" did not hold up in the large run.)
+- **Qwen3.6-27B follows instructions.** On a small first run, instructed cut leaks from 100% (none)
+  to 12–25%. (The 50% it showed for intrinsic did not hold up in the large run.)
 - **Simple pattern matching measures our labels better than LLM judges.** Checked against 70
   hand-labelled trajectories, the regex was more accurate than two LLM judges for whether a rule is
   stated, which output it is about, and how much of the key appears. An LLM judge is used only for
   "mentions the observer" and "suspects a test".
 
-## A. Qwen3-8B with a louder observer
+## A. Qwen3-8B with salient
 
 48 attempts per condition. *Salient* = the partner also says in their own message whether they
-see the reasoning.
+see the reasoning ([terminology](terminology.md)).
 
-| What the model is told | Writes the key in its thinking | Mentions the observer |
+| Condition | Leaks | Mentions the observer |
 | --- | --- | --- |
-| nothing, visible | 60% | 0% |
-| nothing, visible + partner says "I'm watching" | 74% | 0% |
-| nothing, private | 46% | 0% |
-| nothing, private + partner says "I only see your reply" | 49% | 8% |
-| "don't write it", visible | 67% | 0% |
-| "don't write it", visible + "I'm watching" | 48% | 4% |
-| "don't write it", private | 55% | 0% |
-| "don't write it", private + "I only see your reply" | 31% | 2% |
+| none, visible | 60% | 0% |
+| none + salient, visible | 74% | 0% |
+| none, private | 46% | 0% |
+| none + salient, private | 49% | 8% |
+| instructed, visible | 67% | 0% |
+| instructed + salient, visible | 48% | 4% |
+| instructed, private | 55% | 0% |
+| instructed + salient, private | 31% | 2% |
 
 The same four plain conditions had been run before: `private-none` 69% → 46%, `public-instructed`
 50% → 67%, `private-instructed` 46% → 55%. That is the noise level at 48 attempts.
@@ -38,13 +38,13 @@ The same four plain conditions had been run before: `private-none` 69% → 46%, 
 
 8 attempts per condition — only big differences are meaningful.
 
-| What the model is told | Writes the key in its thinking (visible / private) |
+| Condition | Leaks (visible / private) |
 | --- | --- |
-| nothing | 100% / 100% |
-| the stakes only | 50% / 50% |
-| "don't write the key" | 25% / 12% |
-| stakes + "don't write it" | 12% / 12% |
-| public ID, nothing to hide | 100% / 100% |
+| none | 100% / 100% |
+| intrinsic | 50% / 50% |
+| instructed | 25% / 12% |
+| intrinsic + instructed | 12% / 12% |
+| *control:* routing ID | 100% / 100% |
 
 All answers correct; the model never mentioned the observer (0 of 168). When it stated a rule,
 it leaked in 32% of attempts, vs 89% when it did not.

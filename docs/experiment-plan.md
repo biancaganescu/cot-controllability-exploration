@@ -26,6 +26,10 @@ sentence alone, in both visible and private versions. So her *intrinsic* setting
 `reasoning_only` (and `instructed`). H1 as written compares our `instructed` with our
 `intrinsic`; reports also give her contrast (`public-intrinsic` vs the instructed conditions).
 
+The reports name conditions in plain words (none, intrinsic, instructed, intrinsic + instructed,
+instructed + salient, …, visible = `public`); [terminology](terminology.md) maps each name to its
+code and wording. This plan keeps the code names.
+
 ## Hypotheses
 
 Confirmatory (stated by the experimenters before data collection):
