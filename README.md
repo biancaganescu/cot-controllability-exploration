@@ -59,7 +59,7 @@ Qwen3.6-27B.
 
 ## What we found (Qwen3.6-27B, held-out `test`, 320 attempts per condition)
 
-![How often the model writes the key, by condition](docs/figures/leak_by_condition.png)
+![How often the model leaks the key, by condition](docs/figures/leak_by_condition.png)
 
 Accuracy is 100% in every condition (guessing: 50%), so no condition costs the task. All findings
 below first appeared on `validation` and held on new customers and new wording.

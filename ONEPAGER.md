@@ -14,7 +14,7 @@ own reason (**intrinsic**) than when it is told to (**instructed**)?
 characters. The secret part is never needed. We count a **leak** when it appears in the thinking.
 The partner either reads the thinking live (**visible**) or not (**private**).
 
-![Leak rate by condition](docs/figures/leak_by_condition.png)
+![How often the model leaks the key, by condition](docs/figures/leak_by_condition.png)
 
 **Findings** (all first seen on `validation`, confirmed on 32 new customers with new wording):
 

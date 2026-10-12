@@ -33,8 +33,8 @@ ROWS = [('none', '{v}-none'), ('intrinsic', '{v}-intrinsic'), ('instructed', '{v
         ('intrinsic + instructed', '{v}-both'), ('instructed + salient', '{v}_salient-instructed'),
         ('instructed + reminder', '{v}_reminder-instructed'), ('reasoning-only', '{v}-reasoning_only'),
         ('placeholder', '{v}-placeholder')]
-CONTROLS = [('control: routing ID', 'routing.{v}-none'), ('control: placebo', 'placebo-none'),
-            ('control: off-target instructed', 'public-offtarget_instructed')]
+CONTROLS = [('control: routing ID', 'routing.{v}-none'), ('control: placebo (no visibility sentence)', 'placebo-none'),
+            ('control: off-target instructed (visible)', 'public-offtarget_instructed')]
 DECISIONS = {  # key -> (legend text, colour), in stacking order: the key is written, then it is not.
     'after': ('writes the key, states the rule only afterwards', RED),
     'first': ('states the rule, writes the key anyway', YELLOW),
@@ -95,19 +95,21 @@ def leak_by_condition(rows, out):
     for i, (_, pattern) in enumerate(ROWS + CONTROLS):
         for v, name in conditions(pattern).items():
             m, lo, hi = bootstrap(groups[name], 'secret_in_reasoning')
-            colour = VIS[v][1] if v else GRAY
+            colour = VIS[v][1] if v else BLUE if name.startswith('public') else GRAY
             ax.plot([100 * lo, 100 * hi], [i + offsets[v]] * 2, color=colour, lw=1.6, solid_capstyle='round')
             ax.plot(100 * m, i + offsets[v], 'o', ms=4.5, color=colour)
     ax.axhline(len(ROWS) - 0.5, color=GRID, lw=0.8)
     ax.set_yticks(range(len(labels)), labels)
     ax.invert_yaxis()
     ax.set_xlim(0, 101)
-    ax.set_xlabel('attempts that write the key in the thinking (%)')
+    ax.set_xlabel('attempts that leak: the secret key appears in the thinking (%)')
     ax.grid(axis='x', color=GRID, lw=0.6)
     ax.set_axisbelow(True)
-    header(ax, 'How often the model writes the secret key in its thinking',
-           'Qwen3.6-27B, held-out test, 320 attempts per dot; bar = 95% CI. Left = better hidden.')
-    visibility_legend(ax)
+    header(ax, 'How often the model leaks the secret key in its thinking',
+           'Qwen3.6-27B, held-out test, 320 attempts per dot; bar = 95% CI. Further left = better hidden.')
+    handles = [Line2D([], [], color=c, marker='o', ms=5, lw=0) for _, c in VIS.values()]
+    ax.legend(handles, [t for t, _ in VIS.values()], loc='lower left', frameon=True, framealpha=1,
+              edgecolor='white', fontsize=8, handletextpad=0.3)  # sits in the empty left of the control rows
     fig.savefig(out / 'leak_by_condition.png')
     plt.close(fig)
 
