@@ -1,6 +1,6 @@
 # v2, stage 2 of 3: small
 
-← [v2 plan](../plan.md) · previous stage: [smoke](smoke.md) · terms: [terminology](../../../terminology.md)
+← [v2](../README.md) · previous stage: [smoke](smoke.md) · terms: [terminology](../../../terminology.md)
 
 > **Preliminary.** Small is the last check before the plan is frozen. With 24 attempts per condition,
 > a difference of less than about 25 points can be noise. The real numbers come from the `main`

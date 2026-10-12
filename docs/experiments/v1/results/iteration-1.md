@@ -1,6 +1,6 @@
 # Iteration 1: Qwen3-8B
 
-← [README](../../../../README.md) · condition names: [terminology](../../../terminology.md)
+← [v1](../README.md) · terms: [terminology](../../../terminology.md)
 
 ## In short
 

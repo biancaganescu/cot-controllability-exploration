@@ -1,6 +1,6 @@
 # Iteration 2: salient on Qwen3-8B, first look at Qwen3.6-27B, checking our measurements
 
-← [README](../../../../README.md) · condition names: [terminology](../../../terminology.md)
+← [v1](../README.md) · terms: [terminology](../../../terminology.md)
 
 ## In short
 

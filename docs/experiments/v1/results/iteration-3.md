@@ -1,6 +1,6 @@
 # Iteration 3: Qwen3.6-27B, large run
 
-← [README](../../../../README.md) · condition names: [terminology](../../../terminology.md)
+← [v1](../README.md) · terms: [terminology](../../../terminology.md)
 
 ## In short
 

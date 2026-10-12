@@ -1,6 +1,6 @@
 # v2 plan: channel, motivation and reading (A1–A3)
 
-← [README](../../../README.md) · previous: [v1 plan](../v1/plan.md) · terms: [terminology](../../terminology.md)
+← [v2](README.md) · previous version: [v1 plan](../v1/plan.md) · terms: [terminology](../../terminology.md)
 
 Pre-registration, written 2026-10-12 before any v2 data exist; hypotheses and predictions are the
 experimenter's (Danyil's). This plan and the analysis (`scripts/secret_file/analysis/v2.py`) are

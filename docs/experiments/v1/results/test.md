@@ -1,6 +1,6 @@
 # Held-out test: Qwen3.6-27B
 
-← [README](../../../../README.md) · condition names as in the README's [Terminology](../../../../README.md#terminology)
+← [v1](../README.md) · terms: [terminology](../../../terminology.md)
 
 ## In short
 
@@ -93,7 +93,7 @@ stating any), so a low share there does not mean the rule comes early.
 
 ## Figures
 
-All from `scripts/secret_file/plot.py` (`uv run --group plots python scripts/secret_file/plot.py`).
+All from `scripts/secret_file/plots/v1.py` (`uv run --group plots python scripts/secret_file/plots/v1.py`).
 
 ![Every condition by whether and when the rule is stated](../figures/decision_by_condition.png)
 
@@ -217,7 +217,7 @@ bootstrap over the 32 cases (4,000 resamples); "pooled" = over visible and priva
 | Qwen3-8B, first four pooled (`validation`) | −0.006 [−0.095, +0.079] |
 
 States a rule → leaks 49% vs 84% when not (2,846 of 7,360 key trials state one). Timing counts:
-434 intrinsic and 492 instructed trials state a rule; computed by `scripts/secret_file/plot.py`
+434 intrinsic and 492 instructed trials state a rule; computed by `scripts/secret_file/plots/v1.py`
 (not part of the frozen script). An earlier ad-hoc count also took in the off-target email
 conditions (their names end in `_intrinsic` / `_instructed`); corrected here and in iteration 3
 (validation 80% → 83%).

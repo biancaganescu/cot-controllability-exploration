@@ -6,7 +6,7 @@ leaks per wording of the condition sentences. Also prints the per-condition "rul
 per-wording table of intrinsic and instructed. Rates carry
 95% CIs from a bootstrap over customers, as in analysis/v1.py.
 
-    uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/experiments/v1/figures]
+    uv run --group plots python scripts/secret_file/plots/v1.py [--runs outputs/qwen3.6-27b/large] [--out docs/experiments/v1/figures]
 """
 import argparse
 import random

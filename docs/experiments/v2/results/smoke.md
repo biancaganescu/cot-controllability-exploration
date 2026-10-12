@@ -1,6 +1,6 @@
 # v2, stage 1 of 3: smoke
 
-← [v2 plan](../plan.md) · next stage: [small](small.md) · terms: [terminology](../../../terminology.md)
+← [v2](../README.md) · next stage: [small](small.md) · terms: [terminology](../../../terminology.md)
 
 > **Preliminary.** Smoke only checks that the experiment runs correctly. With 24 attempts per
 > condition, a difference of less than about 25 points can be noise. The real numbers come from the

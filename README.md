@@ -29,12 +29,14 @@ reasoning") · **placeholder** ("write `[KEY]`"). Controls: **placebo**, **off-t
 ID**. A **leak** is the secret part of the key in the thinking; a **rule** is a sentence about not
 sharing it.
 
-Exact wordings and every other term: [terminology](docs/terminology.md). Three real attempts:
-[examples](docs/experiments/v1/examples.md).
+Exact wordings and every other term: [terminology](docs/terminology.md). Real attempts, one per
+condition: [v1 examples](docs/experiments/v1/examples.md), [v2 examples](docs/experiments/v2/examples.md).
 
 ## Where we are
 
-### Black-box: what the model writes — done
+### Black-box: what the model writes
+
+Each version has its own page: [v1](docs/experiments/v1/README.md) (closed) · [v2](docs/experiments/v2/README.md) (in progress).
 
 | Iteration | What | Status |
 | --- | --- | --- |
