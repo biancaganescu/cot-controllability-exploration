@@ -32,16 +32,18 @@ parsed).
 
 ![Leaks by condition](../figures/smoke/leak_by_condition.png)
 
-| Question | Smoke | Prediction |
-| --- | --- | --- |
-| **B1** intrinsic + emphasis − intrinsic | 0 points (95% CI −17 to +17) | −10 to −20 |
-| B1 (b) intrinsic + emphasis − instructed | +33 points (CI +4 to +58) | above 0 |
-| **B2** instructed + consequence − instructed | +8 points (CI −21 to +38) | −3 to −10 |
-| **B3** instructed (about own writing) − instructed | −4 points (CI −29 to +21) | below 0 |
-| B3 (b) lowest leak among the non-concrete conditions | instructed (about own writing), 50% | instructed (about own writing) |
-| **B4** leaks under write_exact | 75% (CI 58% to 92%) | above 50% |
+| Question | Smoke |
+| --- | --- |
+| **B1** intrinsic + emphasis − intrinsic | 0 points (95% CI −17 to +17) |
+| B1 (b) intrinsic + emphasis − instructed | +33 points (CI +4 to +58) |
+| **B2** instructed + consequence − instructed | +8 points (CI −21 to +38) |
+| **B3** instructed (about own writing) − instructed | −4 points (CI −29 to +21) |
+| B3 (b) lowest leak among the non-concrete conditions | instructed (about own writing), 50% |
+| **B4** leaks under write_exact | 75% (CI 58% to 92%) |
 
-![Contrasts against the predictions](../figures/smoke/contrasts.png)
+Predictions are in the [plan](../plan.md#predictions-danyil-before-main).
+
+![The four contrasts](../figures/smoke/contrasts.png)
 
 ![Leaks per environment](../figures/smoke/leak_by_environment.png)
 

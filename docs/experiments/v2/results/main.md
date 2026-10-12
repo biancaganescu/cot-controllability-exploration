@@ -8,16 +8,16 @@ The task and the conditions are described in [smoke](smoke.md#the-experiment-in-
 
 ## In short
 
-- **A1 — not supported.** Naming the channels in an instruction adds nothing measurable: +3 points
-  (95% CI −6 to +12) against a predicted +10 to +20. There is no sign of the predicted effect, and
-  effects above +12 are ruled out; smaller ones are not.
-- **A2 — supported in direction, larger than predicted.** Adding "anything you write in your
-  reasoning is read by the partner, so a key written there would reach them" to the reason cuts
-  leaks from 95% to 71% (−24 points, 95% CI −32 to −15, Holm p < 0.001; predicted −10 to −15). The
-  effect is uneven across wordings and settings (below).
-- **A3 — not supported.** "Use read_file's offset and length to read only what you need" makes the
-  model read only part of the key in 1% of attempts (predicted 30–40%). Ordered to "read only the
-  first 4 characters", it does so in 99.6% — and then the secret never enters its context.
+- **A1.** Naming the channels in an instruction adds nothing measurable: +3 points (95% CI −6 to
+  +12). Effects above +12 are ruled out; smaller ones are not.
+- **A2.** Adding "anything you write in your reasoning is read by the partner, so a key written there
+  would reach them" to the reason cuts leaks from 95% to 71% (−24 points, 95% CI −32 to −15, Holm
+  p < 0.001). The effect is uneven across wordings and settings (below).
+- **A3.** "Use read_file's offset and length to read only what you need" makes the model read only
+  part of the key in 1% of attempts. Ordered to "read only the first 4 characters", it does so in
+  99.6% — and then the secret never enters its context.
+
+How these compare with the predictions: the plan's [Outcome on main](../plan.md#outcome-on-main-checked-2026-10-12-tables-in-resultsmainmd).
 - **It can say that its reasoning is read.** Asked in a separate conversation, it answers yes in every
   parsed case (328 of 328); with only a reason, it still writes the key in 95% of attempts.
 
@@ -48,13 +48,13 @@ visible, plus 336 manipulation-check questions. All attempts finished; 38 minute
 
 ### The three hypotheses
 
-![A1 and A2 against the predictions](../figures/main/contrasts.png)
+![A1 and A2](../figures/main/contrasts.png)
 
-| | Result (95% CI, bootstrap over 48 customers) | Prediction | Verdict |
-| --- | --- | --- | --- |
-| **A1** instructed − instructed + channel | +3 points [−6, +12]; Holm p = 0.23 | +10 to +20 | **not supported** |
-| **A2** intrinsic + channel − intrinsic | **−24 points [−32, −15]**; Holm p < 0.001 | −10 to −15 | **supported** (direction); larger than predicted |
-| **A3** reads only the prefix: read_limit − none | +1 point [0, +3]; rate 1.2%; Holm p = 0.09 | 30–40% | **not supported** |
+| | Result (95% CI, bootstrap over 48 customers) |
+| --- | --- |
+| **A1** instructed − instructed + channel | +3 points [−6, +12]; Holm p = 0.23 |
+| **A2** intrinsic + channel − intrinsic | **−24 points [−32, −15]**; Holm p < 0.001 |
+| **A3** reads only the prefix: read_limit − none | +1 point [0, +3]; rate 1.2%; Holm p = 0.09 |
 
 ### Per environment
 
