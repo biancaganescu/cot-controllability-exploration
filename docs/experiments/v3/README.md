@@ -12,10 +12,10 @@ small → main. **In progress.**
 | --- | --- |
 | [plan.md](plan.md) | why v3, conditions, stages, predictions B1–B4, deviations |
 | [results/smoke.md](results/smoke.md) | stage 1: the pipeline works and every new sentence passes the check; first signals |
-| results/small.md | stage 2 — *pending* |
+| [results/small.md](results/small.md) | stage 2: gate passed on new customers; which smoke signals held |
 | results/main.md | stage 3, confirmatory — *pending* |
 | [examples.md](examples.md) | base prompts and one real trajectory per condition (from smoke) |
-| [figures/](figures/) | per-environment figures, one folder per stage (`smoke/` so far) |
+| [figures/](figures/) | per-environment figures, one folder per stage (`smoke/`, `small/` so far) |
 
 Code: dataset `scripts/secret_file/datasets/v3.py`, analysis `scripts/secret_file/analysis/v3.py`,
 figures `scripts/secret_file/plots/v3.py`, stage runner `infra/run_stage.sh` (`DATA=v3`).
