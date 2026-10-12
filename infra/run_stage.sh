@@ -28,6 +28,13 @@ run=$!
 uv run cot-secret-file check --data "$DATA" --model "$MODEL_CFG" --split "$STAGE" \
   --concurrency "$((CONCURRENCY / 4))" --out "$OUT-check" > "logs/$TAG-check.log" 2>&1 &
 check=$!
+# Each command logs to its own file; show one progress line every 30 s here instead.
+while kill -0 "$run" 2>/dev/null || kill -0 "$check" 2>/dev/null; do
+  sleep 30
+  trials=$(grep -c ' after ' "logs/$TAG-run.log" 2>/dev/null || true)
+  checks=$(grep -o '\[[0-9]*/[0-9]*\] checks saved' "logs/$TAG-check.log" 2>/dev/null | tail -1 || true)
+  stamp "$TAG: trials done ${trials:-0}; check ${checks:-starting}"
+done
 status=0
 wait "$run" || { echo "!! trials failed; see logs/$TAG-run.log" >&2; status=1; }
 wait "$check" || { echo "!! check failed; see logs/$TAG-check.log" >&2; status=1; }
