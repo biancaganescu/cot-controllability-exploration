@@ -23,9 +23,9 @@ v2.GROUPS = [('baseline', ['public-none']),
              ('instructed', ['public-directive_reply', 'public-directive_consequence', 'public-directive_output']),
              ('concrete', ['public-write_exact', 'public-read_exact'])]
 v2.CONTRASTS = [  # (label, a, b, predicted range of a - b); predictions as in docs/experiments/v3/plan.md
-    ('B1: intrinsic + emphasis − intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', (0.0, 0.0)),
-    ('    intrinsic + channel − intrinsic', 'public-intrinsic_channel', 'public-intrinsic', (0.0, 0.0)),
-    ('B2: instructed + consequence − instructed', 'public-directive_consequence', 'public-directive_reply', (0.0, 0.0)),
+    ('B1: intrinsic + emphasis − intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', (-0.20, -0.10)),
+    ('    intrinsic + channel − intrinsic (v2: −24)', 'public-intrinsic_channel', 'public-intrinsic', (0.0, 0.0)),
+    ('B2: instructed + consequence − instructed', 'public-directive_consequence', 'public-directive_reply', (-0.10, -0.03)),
     ('B3: output frame − instructed', 'public-directive_output', 'public-directive_reply', (0.0, 0.0)),
     ('B4: write_exact − instructed', 'public-write_exact', 'public-directive_reply', (0.0, 0.0)),
 ]

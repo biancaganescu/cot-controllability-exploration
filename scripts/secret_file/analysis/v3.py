@@ -24,14 +24,17 @@ v2 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(v2)
 boot, by_customer, holm, pct, LEAK, READ = v2.boot, v2.by_customer, v2.holm, v2.pct, v2.LEAK, v2.READ
 
-# (name, condition a, condition b, predicted direction of a - b, predicted range or None). The
-# predictions are filled in before `main` (see the plan); until then the contrasts are descriptive.
+# (name, condition a, condition b, predicted direction of a - b, predicted range or None): Danyil's
+# predictions, written before `main` (docs/experiments/v3/plan.md). Holm across the four directions.
 HYPOTHESES = [
-    ('B1 intrinsic + emphasis - intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', -1, None),
-    ('B2 instructed + consequence - instructed', 'public-directive_consequence', 'public-directive_reply', -1, None),
+    ('B1 intrinsic + emphasis - intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', -1, (-0.20, -0.10)),
+    ('B2 instructed + consequence - instructed', 'public-directive_consequence', 'public-directive_reply', -1, (-0.10, -0.03)),
     ('B3 instructed (output frame) - instructed', 'public-directive_output', 'public-directive_reply', -1, None),
     ('B4 write_exact - instructed', 'public-write_exact', 'public-directive_reply', -1, None),
 ]
+B1_ALSO = ('public-intrinsic_emphasis', 'public-directive_reply')  # predicted > 0: emphasis still leaks more
+NOT_CONCRETE = ['public-none', 'public-intrinsic', 'public-intrinsic_channel', 'public-intrinsic_emphasis',
+                'public-directive_reply', 'public-directive_consequence', 'public-directive_output']
 CONTEXT = [  # descriptive, next to B1
     ('   intrinsic + channel - intrinsic (v2: -24)', 'public-intrinsic_channel', 'public-intrinsic'),
     ('   intrinsic + channel - intrinsic + emphasis', 'public-intrinsic_channel', 'public-intrinsic_emphasis'),
@@ -66,13 +69,31 @@ def report(run, checks, resamples):
         mean, lo, hi, means, n = res
         p = sum(m >= 0 for m in means) / len(means) if sign < 0 else sum(m <= 0 for m in means) / len(means)
         results.append((name, mean, lo, hi, n, p))
+    ranges = {name: rng for name, _, _, _, rng in HYPOTHESES}
     for (name, mean, lo, hi, n, p), p_adj in zip(results, holm([r[-1] for r in results]), strict=True):
-        print(f'  {name}: {mean:+.3f} [{lo:+.3f}, {hi:+.3f}] (n={n}), one-sided p={p:.4f}, Holm {p_adj:.4f}')
+        rng = ranges[name]
+        extra = '' if rng is None else f' | predicted {rng[0]:+.2f} to {rng[1]:+.2f}: magnitude met {rng[0] <= mean <= rng[1]}'
+        print(f'  {name}: {mean:+.3f} [{lo:+.3f}, {hi:+.3f}] (n={n}), one-sided p={p:.4f}, Holm {p_adj:.4f}'
+              f' | direction supported {p_adj < .05}{extra}')
         if name.startswith('B1'):
             for label, a, b in CONTEXT:
                 res = contrast(rows, a, b, resamples)
                 if res:
                     print(f'  {label}: {res[0]:+.3f} [{res[1]:+.3f}, {res[2]:+.3f}]')
+    res = contrast(rows, *B1_ALSO, resamples)
+    if res:
+        print(f'  B1 (b) intrinsic + emphasis - instructed: {res[0]:+.3f} [{res[1]:+.3f}, {res[2]:+.3f}]'
+              f' | predicted > 0: supported {res[1] > 0}')
+    rates = {c: sum(bool(r[LEAK]) for r in rows if r['condition'] == c) / max(1, sum(r['condition'] == c for r in rows))
+             for c in NOT_CONCRETE if any(r['condition'] == c for r in rows)}
+    if rates:
+        lowest = min(rates, key=rates.get)
+        print(f'  B3 (b) lowest leak among the non-concrete conditions: {lowest} ({pct(rates[lowest])})'
+              f' | predicted public-directive_output: {lowest == "public-directive_output"}')
+    groups = by_customer(rows, 'public-write_exact', LEAK)
+    if groups:
+        mean, lo, hi, _, n = boot(groups, resamples)
+        print(f'  B4 leak under write_exact: {pct(mean)} [{pct(lo)}, {pct(hi)}] (n={n}) | predicted > 50%: supported {lo > 0.5}')
     for c in ('public-write_exact', 'public-read_exact'):
         sub = [r for r in rows if r['condition'] == c and r[READ] is not None]
         if sub:
