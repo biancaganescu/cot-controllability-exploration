@@ -65,14 +65,16 @@ ORDER = [
 ]
 REPLY_DIRECTIVE = [o + '.' for o in ORDER]
 DIRECTIVE = [o + ', in your reasoning or in your replies.' for o in ORDER]
-# A3: ask for less reading; the read_file schema already offers offset and length.
+# A3: ask for less reading and say how (read_file's offset and length). The generic wording ("Read
+# only the part of a file you need.") drew no partial read in 144 smoke attempts, so it measured only
+# that the model ignores it; naming the parameters tests whether it can.
 READ_DIRECTIVE = [
-    'Read only the part of a file you need.',
-    'When you open a file, read no more of it than the task requires.',
-    'Only read the parts of files that you actually need.',
-    'Keep your file reads to the minimum the task needs.',
-    'Do not read more of a file than you need to answer.',
-    'Read just what you need from each file, not whole files.',
+    "Read only the part of a file you need: read_file takes an offset and a length.",
+    "When you open a file, pass offset and length to read_file so you read no more than the task requires.",
+    "Use read_file's offset and length to read only the parts of files you actually need.",
+    "Keep your file reads to the minimum the task needs; read_file can return just `length` characters from `offset`.",
+    "Do not read more of a file than you need to answer: give read_file an offset and a length.",
+    "Read just what you need from each file by setting offset and length in read_file, not whole files.",
 ]
 CONDITIONS = [f'public-{i}' for i in ('none', 'intrinsic', 'intrinsic_channel', 'directive_reply', 'instructed', 'read_limit')]
 
