@@ -14,9 +14,9 @@ src/cot_controllability/blackbox/secret_file.py   agentic secret-file runner / s
 src/cot_controllability/blackbox/environments.py  secret_file environments (v2+): base Environment, four settings
 src/cot_controllability/whitebox/                  replay trajectories through HF transformers; activations, J-lens, probes
 src/cot_controllability/data/secret_token.json.gz  prompt template, cases, model profile
-src/cot_controllability/data/secret_file.json.gz   system/user templates, conditions, tools, cases
+src/cot_controllability/data/secret_file/v*.json.gz  one dataset per version: templates, conditions, tools, cases
 scripts/secret_file/                               data builder, frozen analysis, figures (see scripts/README.md)
-docs/experiments/v1/plan.md                            secret_file design, hypotheses, analysis (pre-registration)
+docs/experiments/v*/                               per version: plan (pre-registration), results, examples, figures
 configs/models/*.yaml                              one file per model: backend, sampling, options
 envs/vllm/                                         isolated vLLM env (own torch pins), GPU box only
 infra/setup_pod.sh, infra/serve_vllm.sh            bootstrap a GPU box; serve a model for secret_file
@@ -37,6 +37,57 @@ uv run pytest -v                # offline; API calls are mocked
 
 If another virtualenv is active, uv warns that `VIRTUAL_ENV` is ignored and uses the project
 `.venv`; `deactivate` first to silence it.
+
+## Reproduce
+
+Each experiment's plan and analysis were frozen at a tag before its confirmatory run:
+`experiment-v1`, `experiment-v2`, `experiment-v3`. The run outputs (`outputs/`, about 90 MB of
+transcripts) are git-ignored: they are not in the repository and must be copied in from the authors.
+Everything below runs from the repo root.
+
+### From the saved runs (no GPU, minutes)
+
+The datasets rebuild byte-identical (fixed seeds); `git status` should stay clean afterwards:
+
+```bash
+for v in v1 v2 v3; do uv run python scripts/secret_file/datasets/$v.py; done
+```
+
+Every number, figure and example in the results pages:
+
+| What | Command | Reproduces |
+| --- | --- | --- |
+| v1 analysis | `uv run python scripts/secret_file/analysis/v1.py outputs/qwen3.6-27b/large/test --check logs/qwen3.6-27b-vllm-large-test-check-summary.json` | `docs/experiments/v1/results/test.md` (also `logs/analyze-test.txt`) |
+| v2 analysis | `uv run --group plots python scripts/secret_file/analysis/v2.py outputs/qwen3.6-27b/v2/main --check outputs/qwen3.6-27b/v2/main-check --wording-split --exposure` | `docs/experiments/v2/results/main.md` (same for `smoke`, `small`) |
+| v3 analysis | `uv run python scripts/secret_file/analysis/v3.py outputs/qwen3.6-27b/v3/main --check outputs/qwen3.6-27b/v3/main-check --exposure` | `docs/experiments/v3/results/main.md` (same for `smoke`, `small`) |
+| v1 figures | `uv run --group plots python scripts/secret_file/plots/v1.py` | `docs/experiments/v1/figures/test/` |
+| v2 figures | `uv run --group plots python scripts/secret_file/plots/v2.py outputs/qwen3.6-27b/v2/main --check outputs/qwen3.6-27b/v2/main-check --out docs/experiments/v2/figures/main` | `docs/experiments/v2/figures/main/`; `small` pools `v2/small v2/small-read_exact` and both checks |
+| v3 figures | `uv run --group plots python scripts/secret_file/plots/v3.py outputs/qwen3.6-27b/v3/main --check outputs/qwen3.6-27b/v3/main-check --out docs/experiments/v3/figures/main` (add `--summary` for the one-pager figure) | `docs/experiments/v3/figures/<stage>/` |
+| v3 examples | `uv run python scripts/secret_file/examples/v3.py outputs/qwen3.6-27b/v3/main > docs/experiments/v3/examples.md` | `docs/experiments/v3/examples.md` |
+
+v1's and v2's `examples.md` were written by hand from the saved transcripts and have no script.
+
+### New runs (GPU)
+
+Set up a box and serve the model (see [Running on a GPU box](#running-on-a-gpu-box-vllm)), check out
+the experiment's tag, then:
+
+```bash
+git switch --detach experiment-v3        # or experiment-v1 / experiment-v2
+# v1: train and validation, then the held-out test (32 customers x 10 samples)
+PROFILE=large MODEL_CFG=qwen3.6-27b-vllm bash infra/run_splits.sh train validation
+ALLOW_TEST=1 PROFILE=large MODEL_CFG=qwen3.6-27b-vllm bash infra/run_splits.sh test
+# v2: smoke and small (1 sample), then main (5 samples)
+DATA=v2 STAGE=smoke SAMPLES=1 bash infra/run_stage.sh
+DATA=v2 STAGE=main SAMPLES=5 bash infra/run_stage.sh
+# v3: the same stages, main with 4 samples
+DATA=v3 STAGE=main SAMPLES=4 bash infra/run_stage.sh
+```
+
+Sampling is at temperature 1 with a seed per customer × sample, so a rerun gives new trajectories
+whose rates should agree within the reported CIs; it is not a byte-for-byte replay. Not reproducible
+from the repository: v2's `smoke-1` / `smoke-2` (run on dataset drafts before the wording fixes) and
+v3's exploratory private follow-up (run from a temporary copy of the dataset; see the v3 plan).
 
 ## Commands
 
