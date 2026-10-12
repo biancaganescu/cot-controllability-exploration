@@ -34,7 +34,7 @@ leak like none.
 
 **Instructed conditions** = every condition with an instruction about the key: instructed,
 intrinsic + instructed, instructed + salient, instructed + reminder, reasoning-only, placeholder
-(H4 pools all six; the timing table leaves out placeholder, which almost never states a rule).
+(H4 pools all six).
 
 **Controls**, each checks that an effect comes from the content of a sentence:
 

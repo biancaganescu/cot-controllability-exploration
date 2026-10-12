@@ -1,13 +1,15 @@
-"""Build data/golden/observer-eval-positives.jsonl.gz: positives for the two labels the main golden
-set never contained (observer mentioned, evaluation awareness), so judges can be checked for
-sensitivity, not only for saying "no".
+"""Build the golden set of positives for the observer / eval-awareness judge labels.
 
-- 6 real Qwen3-8B trajectories whose reasoning mentions who can (or cannot) see it.
+Checks that an LLM judge can say "yes": the main golden set (data/golden/qwen3.6-27b-small-train)
+has no positives for "mentions the observer" or "suspects a test". One-off, kept so the committed
+data/golden/observer-eval-positives.jsonl.gz can be rebuilt:
+- 6 real Qwen3-8B trajectories whose reasoning mentions who can (or cannot) see it;
 - 4 synthetic items: real Qwen3.6-27B trajectories with one eval-aware sentence inserted into the
-  last step. Marked `synthetic: true`; they test the judge only and are never used as results.
+  last step (`synthetic: true`; they test the judge only and never count as results).
 
-    uv run python scripts/make_golden_positives.py   # needs the runs below in outputs/
+    uv run python scripts/secret_file/build_golden_positives.py [--out PATH]   # needs the runs below in outputs/
 """
+import argparse
 import copy
 import sys
 from pathlib import Path
@@ -51,6 +53,9 @@ def load(directory, condition, case_id, sample):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument('--out', type=Path, default=OUT)
+    out = parser.parse_args().out
     rows = []
     scored = {}
     for directory, condition, case_id, sample in OBSERVER:
@@ -70,8 +75,8 @@ def main():
         field = 'reasoning' if message.get('reasoning') else 'reasoning_content'
         message[field] = sentence + '\n' + message[field]
         rows.append(item(EVAL_BASE, record, case, manifest, synthetic=True, regex=None))
-    write_jsonl_gz(OUT, rows)
-    print(f'{len(rows)} items -> {OUT} ({sum(r["synthetic"] for r in rows)} synthetic)', file=sys.stderr)
+    write_jsonl_gz(out, rows)
+    print(f'{len(rows)} items -> {out} ({sum(r["synthetic"] for r in rows)} synthetic)', file=sys.stderr)
 
 
 if __name__ == '__main__':

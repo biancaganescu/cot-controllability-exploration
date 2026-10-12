@@ -1,10 +1,11 @@
-"""Figures for the secret_file results (Qwen3.6-27B large runs).
+"""Draw the result figures for a secret_file model (docs/figures/*.png).
 
-    uv run --group plots python scripts/plot_results.py [--runs outputs/qwen3.6-27b/large] [--out docs/figures]
+Descriptive, not part of the frozen analysis: leak rate and thinking length by condition, leaks at
+matched length, when the rule is stated relative to the leak (per condition and per split), and
+stability across splits. Also prints the per-condition "rule only after the leak" table. Rates carry
+95% CIs from a bootstrap over customers, as in analyze.py.
 
-Reads the scored trials of `train`, `validation` and `test`, writes PNGs to `--out` and prints the
-per-condition "rule only after the leak" table. Rates carry 95% CIs from a bootstrap over cases (all
-samples of a case move together), as in scripts/analyze_run.py.
+    uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/figures]
 """
 import argparse
 import random
@@ -236,12 +237,12 @@ def decision_by_condition(rows, out):
 
 
 def timing(rows_by_split, out):
-    """Among attempts that state a rule: before, after, or without writing the key, per split."""
-    groups = {'intrinsic': ('-intrinsic',),
-              'any instruction': ('-instructed', '-both', '-reasoning_only', '_salient-instructed', '_reminder-instructed')}
+    """Among attempts that state a rule, intrinsic vs instructed: before, after, or without the leak, per split."""
+    # One condition each, so both bars come from the same number of attempts (2 x 320 per split).
+    groups = {'intrinsic': ('public-intrinsic', 'private-intrinsic'), 'instructed': ('public-instructed', 'private-instructed')}
     bars = [(f'{name}, {split}', Counter(r['decision'] for r in rows_by_split[split]
-                                         if r['decision'] and r['condition'].endswith(ends)))
-            for name, ends in groups.items() for split in ('validation', 'test')]
+                                         if r['decision'] and r['condition'] in names))
+            for name, names in groups.items() for split in ('validation', 'test')]
     keys = ['after', 'first', 'kept']
     fig, ax = plt.subplots(figsize=(6.4, 1.9))
     stacked(ax, bars, keys)
@@ -249,7 +250,7 @@ def timing(rows_by_split, out):
         ax.text(101, i, f"n={sum(counts[k] for k in keys)}", va='center', fontsize=7.5, color=MUTED)
     ax.set_xlabel('attempts that state a rule about the key (%)')
     header(ax, 'Is the rule stated before or after the key is written?',
-           'Only attempts that state a rule. Under intrinsic the rule mostly comes too late.')
+           'Only attempts that state a rule (n). Under intrinsic the rule mostly comes too late.')
     decision_legend(ax, keys, -0.42)
     fig.savefig(out / 'decision_timing.png')
     plt.close(fig)

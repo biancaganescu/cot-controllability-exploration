@@ -44,7 +44,7 @@ For attempts whose thinking states a rule about the key:
 | --- | --- | --- | --- |
 | intrinsic (our 27B) | 13% | **83%** | 4% |
 | intrinsic, visible (Bianca's Kimi K3) | 10% | 87% | — |
-| instructed conditions (our 27B) | **63%** | 22% | 15% |
+| instructed (our 27B) | **66%** | 21% | 13% |
 
 ### What the rule it states is about
 
@@ -146,7 +146,7 @@ Manipulation check: 369/400 parsed; lowest match `private-placeholder` "must not
 | Qwen3-8B, same pooling | −0.006 [−0.095, +0.079] | — |
 
 States a rule → leaks 39% vs 87% when not (`train`: 36% vs 85%). Timing counts: 53 intrinsic
-and 1,335 instructed-condition trials state a rule (`validation`); Bianca's figure is from her slides
+and 287 instructed trials state a rule (`validation`); Bianca's figure is from her slides
 (3,117 of 5,400 traces). Prediction thresholds as written in the plan: P1 `reasoning_only −
 intrinsic` ≤ −25 points with CI excluding 0 (−24.4 [−31.2, −17.8]); P2 key > `[KEY]` (68% vs
 20%); P3 pooled `public − private` < 0 with CI excluding 0, larger than 8B (−1.9 [−6.2, +2.5]).

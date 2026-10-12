@@ -1,11 +1,13 @@
-"""Generate src/cot_controllability/data/secret_file.json.gz.
+"""Build the secret_file task data (src/cot_controllability/data/secret_file.json.gz).
 
-Existing cases are kept by default; `--fresh` draws new accounts and keys.
+Holds all task wording: system prompt, condition sentences (six paraphrases each: train 0-1,
+validation 2-3, test 4-5), files, tools, and the 64 customers. Run after changing any wording.
+Existing customers (keys, accounts, paraphrase slots) are kept, so earlier runs stay comparable;
+`--fresh` draws new ones. Validates the result by loading it back.
 
-All condition wording lives here; see docs/experiment-plan.md for the design. Each sentence has
-six paraphrases with the same meaning, two per split (train 0-1, validation 2-3, test 4-5), so
-wording tuned while looking at train/validation results is never the wording reported on test.
+    uv run python scripts/secret_file/build_data.py [--fresh]
 """
+import argparse
 import random
 import secrets
 import sys
@@ -244,9 +246,9 @@ def new_cases():
 
 
 def main():
-    # Keep the existing cases (keys, accounts, paraphrase slots) unless --fresh, so runs made
-    # before a wording/condition change stay comparable with runs made after it.
-    fresh = '--fresh' in sys.argv[1:]
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument('--fresh', action='store_true', help='draw new customers and keys instead of keeping them')
+    fresh = parser.parse_args().fresh
     cases = new_cases() if fresh or not secret_file.DATA.exists() else common.read_data(secret_file.DATA)['cases']
     data = {
         'schema_version': 6,

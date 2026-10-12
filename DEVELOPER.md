@@ -13,8 +13,7 @@ src/cot_controllability/secret_token.py            original prompt-token runner 
 src/cot_controllability/secret_file.py             agentic secret-file runner / scorer
 src/cot_controllability/data/secret_token.json.gz  prompt template, cases, model profile
 src/cot_controllability/data/secret_file.json.gz   system/user templates, conditions, tools, cases
-scripts/make_secret_file_data.py                   all secret_file wording; regenerates its data (fresh keys)
-scripts/plot_results.py                            figures in docs/figures (uv run --group plots python scripts/plot_results.py)
+scripts/secret_file/                               data builder, frozen analysis, figures (see scripts/README.md)
 docs/experiment-plan.md                            secret_file design, hypotheses, analysis (pre-registration)
 configs/models/*.yaml                              one file per model: backend, sampling, options
 envs/vllm/                                         isolated vLLM env (own torch pins), GPU box only
@@ -53,6 +52,10 @@ Only `run` and `check` need network access; everything else is offline.
 | `uv run cot-secret-file check --model M --out DIR [--split S] [--concurrency P]` | Manipulation check: one question per case × condition | same |
 | `uv run cot-secret-file score DIR` / `score-check DIR` | Re-score a saved run / check, per condition | free |
 | `uv run cot-unpack [PATH]` | Write readable `.json` copies of `.json.gz` files | free |
+| `uv run python scripts/secret_file/analyze.py DIR [--check SUMMARY]` | Pre-registered analysis of a run | free |
+| `uv run --group plots python scripts/secret_file/plot.py` | Redraw `docs/figures/` | free |
+
+All scripts: [scripts/README.md](scripts/README.md).
 
 ## Reading the data
 
@@ -71,7 +74,7 @@ source of truth; the code never reads the copies.
 
 The `accounts/` tree the model browses is not on disk: `files()` in `secret_file.py` builds it in
 memory for each trial from the case's fields in the dataset (key, routing ID, webhook secret,
-neighbouring account, profile) and the templates in `scripts/make_secret_file_data.py`.
+neighbouring account, profile) and the templates in `scripts/secret_file/build_data.py`.
 
 ## Running on a GPU box (vLLM)
 
@@ -244,11 +247,11 @@ judge on the golden items' own transcripts (cached: items it has seen cost nothi
 labels stored in the items, so it also works for synthetic items. On the 60-item golden set regex
 beat both judges on the four fields it covers (see the plan's deviations), so regex is the measure
 for those and the judge is used only for `observer_mentioned` / `eval_aware`.
-`scripts/make_golden_positives.py` builds a second golden set with positives for those two
+`scripts/secret_file/build_golden_positives.py` builds a second golden set with positives for those two
 (6 real Qwen3-8B observer mentions, 4 synthetic eval-aware items marked `synthetic: true`):
 
 ```bash
-uv run python scripts/make_golden_positives.py
+uv run python scripts/secret_file/build_golden_positives.py
 uv run cot-label label data/golden/observer-eval-positives.jsonl.gz
 uv run cot-judge agree data/golden/observer-eval-positives.jsonl.gz --judge claude-haiku-4.5
 ```

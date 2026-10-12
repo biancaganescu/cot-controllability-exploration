@@ -72,8 +72,8 @@ below first appeared on `validation` and held on new customers and new wording.
    visible leaks 12 points less than private (intrinsic: 11 points on `test`, none on
    `validation`); under none, visible and private are the same. Qwen3-8B shows no such effect.
 3. **It often decides too late.** Under intrinsic, when the model states a rule, 50–83% of the time
-   it does so *after* the leak (Bianca's Kimi K3: 87%). Under the instructed conditions, most state
-   it first.
+   it does so *after* the leak (Bianca's Kimi K3: 87%); under instructed, 21–26%. Intrinsic also
+   states a rule less often (17–68% of attempts vs 77–90%), so its bars rest on fewer attempts.
 
    ![When the rule is stated, relative to the leak](docs/figures/decision_timing.png)
 

@@ -67,11 +67,12 @@ For attempts whose thinking states a rule about the key:
 | intrinsic, `test` | 23% | **50%** | 27% |
 | intrinsic, `validation` | 13% | **83%** | 4% |
 | intrinsic (visible), Bianca's Kimi K3 | 10% | 87% | — |
-| instructed conditions, `test` | **57%** | 24% | 19% |
-| instructed conditions, `validation` | **63%** | 22% | 15% |
+| instructed, `test` | **54%** | 26% | 20% |
+| instructed, `validation` | **66%** | 21% | 13% |
 
-"Instructed conditions" = instructed, intrinsic + instructed, instructed + salient, instructed +
-reminder, reasoning-only.
+n (attempts that state a rule, of 640 on `test` / 320 on `validation`): intrinsic 434 / 53,
+instructed 492 / 287 — intrinsic states a rule less often, most of all on `validation`. Pooling all
+five instructed conditions gives the same split (57/24/19 on `test`).
 
 Per condition, as a share of all attempts: how often the model leaks first and states the rule only
 afterwards.
@@ -92,7 +93,7 @@ stating any), so a low share there does not mean the rule comes early.
 
 ## Figures
 
-All from `scripts/plot_results.py` (`uv run --group plots python scripts/plot_results.py`).
+All from `scripts/secret_file/plot.py` (`uv run --group plots python scripts/secret_file/plot.py`).
 
 ![Every condition by whether and when the rule is stated](figures/decision_by_condition.png)
 
@@ -118,7 +119,7 @@ close its wording comes to an instruction; its direction does not.
 Setup as in [iteration 3](results-iteration-3.md): `Qwen/Qwen3.6-27B`, vLLM 0.31.0, one A100
 80GB, thinking mode, temperature 1.0, top-p 0.95, top-k 20, `max_tokens` 8,192 per step, up to
 6 steps, concurrency 128. 8,000 trials + an 800-question manipulation check, 172 min. Output of
-`scripts/analyze_run.py` at `experiment-v1` (babe4bb).
+`scripts/analyze_run.py` at `experiment-v1` (babe4bb; now `scripts/secret_file/analyze.py`).
 
 **Per condition (n = 320).** Channel columns split the trials that state a rule; `[KEY]` = the
 placeholder appears in the thinking.
@@ -188,7 +189,7 @@ bootstrap over the 32 cases (4,000 resamples); "pooled" = over visible and priva
 | Qwen3-8B, first four pooled (`validation`) | −0.006 [−0.095, +0.079] |
 
 States a rule → leaks 49% vs 84% when not (2,846 of 7,360 key trials state one). Timing counts:
-434 uninstructed and 2,336 instructed trials state a rule; computed by `scripts/plot_results.py`
+434 intrinsic and 492 instructed trials state a rule; computed by `scripts/secret_file/plot.py`
 (not part of the frozen script). An earlier ad-hoc count also took in the off-target email
 conditions (their names end in `_intrinsic` / `_instructed`); corrected here and in iteration 3
 (validation 80% → 83%).

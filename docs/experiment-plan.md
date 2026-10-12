@@ -3,7 +3,7 @@
 Pre-registration for the agentic secret-file task. Written before any model run; any later
 change to hypotheses, outcomes or analysis is logged in [Deviations](#deviations) with a date
 and reason. Code: `src/cot_controllability/secret_file.py`; wording:
-`scripts/make_secret_file_data.py`.
+`scripts/secret_file/build_data.py`.
 
 ## Question
 
@@ -296,6 +296,9 @@ missed; such results are reported with their CIs rather than as nulls.
 
 ## Deviations
 
+- **2026-10-12, scripts moved:** `scripts/analyze_run.py` is now `scripts/secret_file/analyze.py`,
+  wrapped in `main()` with arguments; its output on `test` is byte-identical to the report made
+  with the tagged version (`logs/analyze-test.txt`). Paths below refer to the tagged commit.
 - **2026-10-12, analysis of `test`:** the frozen script (`scripts/analyze_run.py` at
   `experiment-v1`) reports 95% cluster-bootstrap CIs with 4,000 resamples; the Holm correction, the
   mixed-effects regression and the A/A calibration described under Analysis were not implemented
