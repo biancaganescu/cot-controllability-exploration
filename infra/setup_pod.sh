@@ -30,6 +30,16 @@ driver_cuda=$(nvidia-smi | grep -oP 'CUDA Version: \K[0-9.]+')
 [ "$(printf '%s\n' "$MIN_DRIVER_CUDA" "$driver_cuda" | sort -V | head -1)" = "$MIN_DRIVER_CUDA" ] \
   || die "driver supports CUDA $driver_cuda < $MIN_DRIVER_CUDA: pick an image with a newer driver"
 
+# vLLM's flashinfer sampler is JIT-compiled at server start: it needs nvcc and a g++ for the default
+# gcc's version. Some images ship neither (a Sesterce Ubuntu 22.04 box had gcc 12 with g++ 11 only).
+if ! command -v nvcc >/dev/null && [ ! -x /usr/local/cuda/bin/nvcc ]; then
+  echo ">> installing the CUDA 12.9 toolkit (nvcc) for flashinfer's JIT"
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cuda-toolkit-12-9 >/dev/null
+fi
+gcc_major=$(gcc -dumpversion | cut -d. -f1)
+dpkg -s "g++-$gcc_major" >/dev/null 2>&1 \
+  || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "g++-$gcc_major" >/dev/null
+
 if ! command -v uv >/dev/null; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi

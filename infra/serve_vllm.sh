@@ -17,6 +17,11 @@ if [ -z "${HF_HOME:-}" ]; then
   done
 fi
 
+# flashinfer finds nvcc through CUDA_HOME or PATH (setup_pod.sh installs it if the image lacks it).
+if [ -z "${CUDA_HOME:-}" ] && [ -x /usr/local/cuda/bin/nvcc ]; then
+  export CUDA_HOME=/usr/local/cuda PATH="/usr/local/cuda/bin:$PATH"
+fi
+
 MODEL="${MODEL:-Qwen/Qwen3-8B}"
 # Loopback only: vLLM defaults to 0.0.0.0, and an open port on a cloud box gets scanned and used.
 HOST="${HOST:-127.0.0.1}"
