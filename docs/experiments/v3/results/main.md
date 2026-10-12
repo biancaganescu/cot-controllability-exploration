@@ -148,12 +148,17 @@ answers.
 | "keep the API key out of everything you write" | 108 of 192 (56%) | 130 of 192 (68%) | +12 [+2, +21] |
 | about own writing − do not share | −15 [−24, −7] | −9 [−17, −1] | interaction +6 [−5, +17] |
 
-- **Most of the better wording's advantage survives without an audience** (−9 in private vs −15 in
-  public), so it is mostly a broader ban, as Danyil predicted.
-- **The interaction (+6) is not distinguishable from 0**, but its CI allows up to +17: this run cannot
-  rule out that about a third of the advantage relies on the thinking being read.
-- **Both instructions leak more when nobody reads the thinking**, significantly so for "out of
-  everything you write": the model takes visibility into account a little.
+- **Read with care: in private, "leak" means different things for the two instructions.** When the
+  partner cannot read the thinking, a key written there does not break "do not share with the partner"
+  at all, so its 77% is compliance, not a violation; for "out of everything you write" it still is a
+  violation. The interaction therefore compares two different outcomes and cannot show that the
+  audience does not matter.
+- **The one clear effect: "out of everything you write" is followed less when nobody reads the
+  thinking** (+12 points [+2, +21]). A purely literal ban would not depend on the audience, so this
+  speaks against a clean "broader ban" reading — the model weighs who reads, at least for this wording.
+- Under private the better wording still leaks less than "do not share" (−9 [−17, −1]; −15 in public),
+  and the interaction is +6 [−5, +17]. Danyil's prediction (interaction ≈ 0) is not contradicted, but,
+  for the reason above, not supported either.
 
 Output `outputs/qwen3.6-27b/v3/main-private`, 384 attempts, all answered correctly.
 
