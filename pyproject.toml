@@ -17,6 +17,14 @@ dev = [
 plots = [
     "matplotlib>=3.10.9",
 ]
+# White-box: replay trajectories through HF transformers (GPU box for the 27B model; the tokenizer alone runs anywhere).
+whitebox = [
+    "torch>=2.6",
+    "transformers>=4.57",
+    "safetensors>=0.5",
+    "scikit-learn>=1.6",
+    "jlens @ git+https://github.com/anthropics/jacobian-lens",
+]
 
 [project.scripts]
 cot-secret-token = "cot_controllability.blackbox.secret_token:main"
@@ -24,6 +32,7 @@ cot-secret-file = "cot_controllability.blackbox.secret_file:main"
 cot-unpack = "cot_controllability.common:main"
 cot-judge = "cot_controllability.judge:main"
 cot-label = "cot_controllability.label:main"
+cot-whitebox = "cot_controllability.whitebox.cli:main"
 
 [build-system]
 requires = ["hatchling"]
