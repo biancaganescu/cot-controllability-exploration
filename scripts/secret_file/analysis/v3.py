@@ -5,7 +5,7 @@ over customers, one-sided p in the predicted direction, Holm across the confirma
 - B1 emphasis: intrinsic + emphasis - intrinsic, next to intrinsic + channel - intrinsic and the
   direct channel - emphasis;
 - B2 consequence: instructed + consequence - instructed;
-- B3 output frame: instructed (output frame) - instructed;
+- B3 instructed (about own writing) - instructed;
 - B4 concrete writing: write_exact - instructed (and its partial reads next to read_exact).
 Also per-condition rates, per environment, per wording, and the manipulation check. The helpers are
 v2's (analysis/v2.py), loaded by path.
@@ -29,7 +29,7 @@ boot, by_customer, holm, pct, LEAK, READ = v2.boot, v2.by_customer, v2.holm, v2.
 HYPOTHESES = [
     ('B1 intrinsic + emphasis - intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', -1, (-0.20, -0.10)),
     ('B2 instructed + consequence - instructed', 'public-directive_consequence', 'public-directive_reply', -1, (-0.10, -0.03)),
-    ('B3 instructed (output frame) - instructed', 'public-directive_output', 'public-directive_reply', -1, None),
+    ('B3 instructed (about own writing) - instructed', 'public-directive_output', 'public-directive_reply', -1, None),
     ('B4 write_exact - instructed', 'public-write_exact', 'public-directive_reply', -1, None),
 ]
 B1_ALSO = ('public-intrinsic_emphasis', 'public-directive_reply')  # predicted > 0: emphasis still leaks more

@@ -15,7 +15,7 @@ _spec.loader.exec_module(v2)
 
 v2.ROWS = [('none', 'public-none'), ('intrinsic', 'public-intrinsic'), ('intrinsic + channel', 'public-intrinsic_channel'),
            ('intrinsic + emphasis', 'public-intrinsic_emphasis'), ('instructed', 'public-directive_reply'),
-           ('instructed + consequence', 'public-directive_consequence'), ('instructed (output frame)', 'public-directive_output'),
+           ('instructed + consequence', 'public-directive_consequence'), ('instructed (about own writing)', 'public-directive_output'),
            ('write_exact', 'public-write_exact'), ('read_exact', 'public-read_exact')]
 v2.LABEL = {c: label for label, c in v2.ROWS}
 v2.GROUPS = [('baseline', ['public-none']),
@@ -26,7 +26,7 @@ v2.CONTRASTS = [  # (label, a, b, predicted range of a - b); predictions as in d
     ('B1: intrinsic + emphasis − intrinsic', 'public-intrinsic_emphasis', 'public-intrinsic', (-0.20, -0.10)),
     ('    intrinsic + channel − intrinsic (v2: −24)', 'public-intrinsic_channel', 'public-intrinsic', (0.0, 0.0)),
     ('B2: instructed + consequence − instructed', 'public-directive_consequence', 'public-directive_reply', (-0.10, -0.03)),
-    ('B3: output frame − instructed', 'public-directive_output', 'public-directive_reply', (0.0, 0.0)),
+    ('B3: instructed (about own writing) − instructed', 'public-directive_output', 'public-directive_reply', (0.0, 0.0)),
     ('B4: write_exact − instructed', 'public-write_exact', 'public-directive_reply', (0.0, 0.0)),
 ]
 v2.READING = ('public-none', 'public-write_exact', 'public-read_exact')

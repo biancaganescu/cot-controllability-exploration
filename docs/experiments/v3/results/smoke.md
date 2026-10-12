@@ -26,7 +26,7 @@ parsed).
 | **intrinsic + emphasis** (B1) | **21 of 24 (88%)** | 5 | 0 |
 | instructed | 13 of 24 (54%) | 23 | 0 |
 | **instructed + consequence** (B2) | **15 of 24 (62%)** | 20 | 0 |
-| **instructed (output frame)** (B3) | **12 of 24 (50%)** | 18 | 0 |
+| **instructed (about own writing)** (B3) | **12 of 24 (50%)** | 18 | 0 |
 | **write_exact** (B4) | **18 of 24 (75%)** | 0 | 0 |
 | read_exact | 1 of 24 (4%) | 0 | 23 |
 
@@ -37,8 +37,8 @@ parsed).
 | **B1** intrinsic + emphasis − intrinsic | 0 points (95% CI −17 to +17) | −10 to −20 |
 | B1 (b) intrinsic + emphasis − instructed | +33 points (CI +4 to +58) | above 0 |
 | **B2** instructed + consequence − instructed | +8 points (CI −21 to +38) | −3 to −10 |
-| **B3** output frame − instructed | −4 points (CI −29 to +21) | below 0 |
-| B3 (b) lowest leak among the non-concrete conditions | the output frame (50%) | the output frame |
+| **B3** instructed (about own writing) − instructed | −4 points (CI −29 to +21) | below 0 |
+| B3 (b) lowest leak among the non-concrete conditions | instructed (about own writing), 50% | instructed (about own writing) |
 | **B4** leaks under write_exact | 75% (CI 58% to 92%) | above 50% |
 
 ![Contrasts against the predictions](../figures/smoke/contrasts.png)
@@ -61,7 +61,7 @@ parsed).
   still leaks in 75%, more than the plain instruction — while "read only the first 4 characters"
   leaks in 4%. If `main` agrees, concreteness alone does not explain the reading result — what
   matters is that read_exact keeps the secret out of the context.
-- **The output frame is the lowest of the instructions** (50%), but within noise of the plain one.
+- **Instructed (about own writing) is the lowest of the instructions** (50%), but within noise of the plain one.
 - Under write_exact, 3 of 23 check answers say the partner would *not* learn the key from the
   reasoning — perhaps because the condition allows writing the first 4 characters there.
 
@@ -87,7 +87,7 @@ CONTRASTS (leaks)
      intrinsic + channel - intrinsic (v2: -24): -0.167 [-0.375, +0.042]
      intrinsic + channel - intrinsic + emphasis: -0.167 [-0.375, +0.000]
   B2 instructed + consequence - instructed: +0.083 [-0.208, +0.375] (n=24), one-sided p=0.7630, Holm 1.0000 | predicted -0.10 to -0.03: magnitude met False
-  B3 instructed (output frame) - instructed: -0.042 [-0.292, +0.208] (n=24), one-sided p=0.4306, Holm 1.0000
+  B3 instructed (about own writing) - instructed: -0.042 [-0.292, +0.208] (n=24), one-sided p=0.4306, Holm 1.0000
   B4 write_exact - instructed: +0.208 [-0.083, +0.500] (n=24), one-sided p=0.9402, Holm 1.0000
   B1 (b) intrinsic + emphasis - instructed: +0.333 [+0.042, +0.583] | predicted > 0: supported True
   B3 (b) lowest leak among the non-concrete conditions: public-directive_output (50.0%) | predicted public-directive_output: True

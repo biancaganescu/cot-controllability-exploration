@@ -6,7 +6,7 @@ environments, with every shared sentence copied from v2 so the baselines are ide
   reasoning — does v2's channel sentence work because of the reasoning, or because it is one more
   sentence about the key?
 - instructed + consequence: the instruction plus v2's channel sentence — the missing cell of the 2 x 2;
-- instructed, output frame: an instruction about what the model writes, not about the partner — does
+- instructed, about own writing: an instruction about what the model writes, not about the partner — does
   v1's stronger instruction come from its framing?
 - write_exact: a concrete instruction about what to write, as concrete as read_exact is about reading.
 
