@@ -122,7 +122,7 @@ in cloud the partner is a contractor "who processes data for Stratus customers" 
 reach those customers' storage" — the very access the reason warns about — so the partner holding the
 key may not read as harm. Untested.
 
-Counts from `scripts/secret_file/analysis/v2_wording.py` (the scorer's rule and leak tests, the same
+Counts from `scripts/secret_file/analysis/v2.py --wording-split` (the scorer's rule and leak tests, the same
 as the rule-timing figure); 40 attempts per wording, 60 per environment, one model.
 
 ### Knows vs does

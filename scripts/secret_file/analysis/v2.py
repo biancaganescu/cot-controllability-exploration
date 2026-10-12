@@ -7,12 +7,20 @@ wordings); one-sided bootstrap p-values in the predicted direction, Holm-correct
 Also (descriptive): per-condition rates, the three contrasts per environment, per-wording rates,
 and the manipulation check with K1 answers.
 
+`--wording-split` adds a post-hoc section written after `main` (not pre-registered; results/main.md,
+"Why w4 and w6"): under intrinsic + channel, per wording and per environment, how many attempts state
+a rule, its timing (the rule-timing figure's categories) and how many rules are about the reply only.
+It reuses plots/v1.py's rule timing, so it needs the plots group.
+
     uv run python scripts/secret_file/analysis/v2.py outputs/qwen3.6-27b/v2/main \\
         [--check outputs/qwen3.6-27b/v2/main-check] [--resamples 10000]
+    uv run --group plots python scripts/secret_file/analysis/v2.py outputs/qwen3.6-27b/v2/main --wording-split
 """
 import argparse
+import importlib.util
 import random
-from collections import defaultdict
+from collections import Counter, defaultdict
+from pathlib import Path
 
 from cot_controllability import secret_file as sf
 
@@ -134,13 +142,35 @@ def report(run, check, resamples):
             print(f"  {c:<28} parsed {e['parsed']}/{e['planned']} | " + ' | '.join(parts) + f' | K1: {k1}')
 
 
+def wording_split(run, condition='public-intrinsic_channel'):
+    """Post-hoc: rule, rule timing and reply-only rules per wording and per environment."""
+    spec = importlib.util.spec_from_file_location('plots_v1', Path(__file__).parents[1] / 'plots' / 'v1.py')
+    plots_v1 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(plots_v1)  # imported here: only this section needs matplotlib
+    rows = [r for r in sf.score_run(run)['trials'] if r['condition'] == condition]
+    plots_v1.add_decisions(Path(run), rows)
+    keys = list(plots_v1.DECISIONS)
+    print(f'\nPOST-HOC: wording split under {condition} (rule timing as in the rule-timing figure)')
+    for label, group in (('wording', lambda r: f"w{r['paraphrase']['instruction'] + 1}"), ('env', lambda r: r['domain'])):
+        print(f"  {label:<9} {'n':>3} {'rule':>5} {'reply only':>11}  " + '  '.join(f'{k:>11}' for k in keys))
+        for g in sorted({group(r) for r in rows}):
+            sub = [r for r in rows if group(r) == g]
+            decisions = Counter(r['decision'] for r in sub)
+            reply_only = sum(bool(r['rule_about_reply']) and not r['rule_about_reasoning'] for r in sub)
+            print(f"  {g:<9} {len(sub):>3} {sum(bool(r['rule_verbalized']) for r in sub):>5} {reply_only:>11}  "
+                  + '  '.join(f'{decisions[k]:>11}' for k in keys))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('run', help='v2 run directory')
     parser.add_argument('--check', help='manipulation-check directory of the same split')
     parser.add_argument('--resamples', type=int, default=10000)
+    parser.add_argument('--wording-split', action='store_true', help='add the post-hoc wording-split section')
     args = parser.parse_args()
     report(args.run, args.check, args.resamples)
+    if args.wording_split:
+        wording_split(args.run)
 
 
 if __name__ == '__main__':
