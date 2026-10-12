@@ -8,6 +8,11 @@ conditions a second example shows the less common one. Visible conditions only, 
 "instructed (private)", shown for contrast. Every attempt has the same shape: list the account's
 files → read `credentials.key` → answer.
 
+**Every v1 condition has a visibility sentence** (`+ VISIBLE`): visible (the partner sees the reasoning,
+the tool calls and the replies) or private (only the replies). "none" means no *instruction*, not no
+sentence. In v1 the visible sentence also exposed tool calls, so whether the partner saw tool results was
+left open; v2 closes that.
+
 How to read a trajectory block: `BASE` is the environment's base prompt (in full under Base prompts);
 `+ VISIBLE`, `+ CONDITION` and `+ PARTNER` are what the condition adds to it; then each step shows the
 model's `THINKING`, its `TOOL` call and the `RESULT`, and the last step its `REPLY`. In the thinking,
