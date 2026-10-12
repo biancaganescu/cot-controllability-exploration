@@ -250,10 +250,10 @@ def timing(rows_by_split, out):
     fig, ax = plt.subplots(figsize=(6.4, 1.9))
     stacked(ax, bars, keys)
     for i, (_, counts) in enumerate(bars):
-        ax.text(101, i, f"n={sum(counts[k] for k in keys)}", va='center', fontsize=7.5, color=MUTED)
+        ax.text(101, i, f"{sum(counts[k] for k in keys)} of {sum(counts.values())}", va='center', fontsize=7.5, color=MUTED)
     ax.set_xlabel('attempts that state a rule about the key (%)')
     header(ax, 'Is the rule stated before or after the key is written?',
-           'Only attempts that state a rule (n). Under intrinsic the rule mostly comes too late.')
+           'Right: attempts that state a rule, of all attempts. Under intrinsic the rule mostly comes too late.')
     decision_legend(ax, keys, -0.42)
     fig.savefig(out / 'decision_timing.png')
     plt.close(fig)
