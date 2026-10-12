@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Serve MODEL with an OpenAI-compatible API for `cot-secret-file run --backend vllm`. Run in tmux.
 #   MODEL=Qwen/Qwen3-8B bash infra/serve_vllm.sh
-# Env knobs: MODEL, PORT (8000), MAX_MODEL_LEN, TP (tensor parallel, 1), GPU_MEM_UTIL (0.95),
-# EXTRA (extra vllm flags).
+# Env knobs: MODEL, HOST (127.0.0.1), PORT (8000), MAX_MODEL_LEN, TP (tensor parallel, 1),
+# GPU_MEM_UTIL (0.95), VLLM_API_KEY (required by the server if set), EXTRA (extra vllm flags).
+# Reach it from a laptop through SSH, not an open port: ssh -N -L 8000:localhost:8000 <box>
 set -euo pipefail
 # uv lives in ~/.local/bin (setup_pod.sh); non-interactive shells (tmux via ssh) skip ~/.bashrc.
 export PATH="$HOME/.local/bin:$PATH"
@@ -17,6 +18,8 @@ if [ -z "${HF_HOME:-}" ]; then
 fi
 
 MODEL="${MODEL:-Qwen/Qwen3-8B}"
+# Loopback only: vLLM defaults to 0.0.0.0, and an open port on a cloud box gets scanned and used.
+HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8000}"
 TP="${TP:-1}"
 # A larger KV cache means fewer preemptions at high concurrency (vLLM's 0.92 left ~5 GiB unused
@@ -35,9 +38,12 @@ case "$MODEL" in
     echo "!! no parser mapping for $MODEL; add one here" >&2; exit 1 ;;
 esac
 
+AUTH=()
+[ -n "${VLLM_API_KEY:-}" ] && AUTH=(--api-key "$VLLM_API_KEY")
+
 # Sampling is sent explicitly in every request (configs/models/*.yaml), so saved request bodies
 # record it; the server's generation_config defaults only matter for fields we leave out.
 exec uv run --project envs/vllm vllm serve "$MODEL" \
-  --port "$PORT" --tensor-parallel-size "$TP" --max-model-len "$MAX_MODEL_LEN" --gpu-memory-utilization "$GPU_MEM_UTIL" \
+  --host "$HOST" --port "$PORT" --tensor-parallel-size "$TP" --max-model-len "$MAX_MODEL_LEN" --gpu-memory-utilization "$GPU_MEM_UTIL" \
   --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser "$TOOL_PARSER" \
-  "${MODEL_FLAGS[@]}" ${EXTRA:-}
+  "${MODEL_FLAGS[@]}" "${AUTH[@]}" ${EXTRA:-}
