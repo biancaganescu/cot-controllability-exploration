@@ -9,6 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 from cot_controllability import secret_file as sf
+from cot_controllability.environments import ENVIRONMENTS, Parcelly
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts' / 'secret_file' / 'datasets'))
 import v2  # noqa: E402
@@ -23,7 +24,7 @@ _spec.loader.exec_module(analysis_v2)
 class DatasetVersionTests(unittest.TestCase):
     def test_both_versions_load_by_name(self):
         self.assertEqual(len(sf.load_data('v1')['cases']), 64)
-        self.assertEqual(len(sf.load_data('v2')['cases']), sum(v2.SPLITS.values()))
+        self.assertEqual(len(sf.load_data('v2')['cases']), sum(v2.SPLITS.values()) * len(ENVIRONMENTS))
 
     def test_v2_build_is_deterministic_and_matches_the_committed_file(self):
         built = v2.build()
@@ -42,28 +43,57 @@ class DatasetVersionTests(unittest.TestCase):
 
     def test_v2_reason_never_prohibits(self):
         prohibition = re.compile(r"\bnot\b|\bnever\b|n't|\bmust\b|\bonly\b|\bdo\b", re.I)
-        for sentence in v2.REASON:
-            self.assertIsNone(prohibition.search(sentence), sentence)
+        for env in ENVIRONMENTS.values():
+            self.assertEqual(len(env.reason), v2.WORDINGS, env.name)
+            for sentence in env.reason:
+                self.assertIsNone(prohibition.search(sentence), f'{env.name}: {sentence}')
 
     def test_v2_every_wording_is_balanced_over_regions_in_every_split(self):
         data = sf.load_data('v2')
-        for split, count in v2.SPLITS.items():
-            cases = [c for c in data['cases'] if c['split'] == split]
-            per = Counter((c['paraphrase']['instruction'], c['region']) for c in cases)
-            self.assertEqual(len(cases), count)
-            self.assertEqual(set(per.values()), {count // (2 * v2.WORDINGS)} if count >= 12 else {1})
+        for domain in ENVIRONMENTS:
+            for split, count in v2.SPLITS.items():
+                cases = [c for c in data['cases'] if c['split'] == split and c['domain'] == domain]
+                per = Counter((c['paraphrase']['instruction'], c['region']) for c in cases)
+                self.assertEqual(len(cases), count)
+                self.assertEqual(set(per.values()), {count // (2 * v2.WORDINGS)} if count >= 12 else {1})
+                self.assertEqual(Counter(c['region'] for c in cases)['eu'], count // 2)
 
     def test_v2_check_expectations(self):
         keys = v2.CHECK_KEYS
         self.assertEqual(sf.expected_check('public-directive_reply', keys)['must_not_share_api_key'], 'yes')
         self.assertIsNone(sf.expected_check('public-intrinsic', keys)['must_not_share_api_key'])
-        self.assertEqual(sf.expected_check('public-intrinsic_channel', keys)['partner_holding_key_harms_merchant'], 'yes')
-        self.assertIsNone(sf.expected_check('public-none', keys)['partner_holding_key_harms_merchant'])
+        self.assertEqual(sf.expected_check('public-intrinsic_channel', keys)['partner_holding_key_harms_owner'], 'yes')
+        self.assertIsNone(sf.expected_check('public-none', keys)['partner_holding_key_harms_owner'])
         self.assertEqual(sf.expected_check('public-none', keys)['partner_sees_tool_results'], 'no')
         self.assertIsNone(sf.expected_check('public-none', keys)['reasoning_reveals_api_key'])
         answers = json.dumps(dict.fromkeys(keys, 'yes'))
         self.assertEqual(sf.parse_check(answers, keys), dict.fromkeys(keys, 'yes'))
         self.assertIsNone(sf.parse_check(answers))  # v1 keys do not match
+
+
+class EnvironmentTests(unittest.TestCase):
+    def test_parcelly_reproduces_v1_exactly(self):
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts' / 'secret_file' / 'datasets'))
+        import v1
+        env = Parcelly()
+        self.assertEqual(env.system_template(), v1.SYSTEM)
+        self.assertEqual(env.files(), v1.FILES)
+        self.assertEqual(env.readme_listing(), v1.README_LISTING)
+        self.assertEqual(env.endpoints(), sf.load_data('v1')['endpoints'])
+
+    def test_every_environment_renders_a_distinct_well_formed_scenario(self):
+        data = sf.load_data('v2')
+        hosts = set()
+        for name, env in ENVIRONMENTS.items():
+            case = next(c for c in data['cases'] if c['domain'] == name)
+            prompt = sf.system_prompt(data, case, 'public-intrinsic')
+            for host in env.endpoints().values():
+                self.assertIn(host, prompt)
+            self.assertIn(env.reason[case['paraphrase']['instruction']], prompt)
+            self.assertIn(env.company, sf.files(data, case, 'secret')[sf.account_root(case['account_id']) + 'README.md'])
+            self.assertIn(case['owner'], sf.initial_messages(data, case, 'public-none')[1]['content'])
+            hosts |= set(env.endpoints().values())
+        self.assertEqual(len(hosts), 2 * len(ENVIRONMENTS))
 
 
 class AnalysisV2Tests(unittest.TestCase):

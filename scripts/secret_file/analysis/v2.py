@@ -4,7 +4,8 @@ Checks A1-A3 on visible conditions: A1 directive_reply - instructed and A2 intri
 intrinsic (leaks, paired within customer x sample), A3 partial reads under read_limit vs none.
 95% CIs from a bootstrap over customers (each customer carries one wording, so this also resamples
 wordings); one-sided bootstrap p-values in the predicted direction, Holm-corrected across A1-A3.
-Also: per-condition rates, per-wording rates, and the manipulation check with K1 answers.
+Also (descriptive): per-condition rates, the three contrasts per environment, per-wording rates,
+and the manipulation check with K1 answers.
 
     uv run python scripts/secret_file/analysis/v2.py outputs/qwen3.6-27b/v2/main \\
         [--check outputs/qwen3.6-27b/v2/main-check] [--resamples 10000]
@@ -94,6 +95,18 @@ def report(run, check, resamples):
         direction = (lo > 0) if sign > 0 else (hi < 0)
         print(f'  {name}: {mean:+.3f} [{lo:+.3f}, {hi:+.3f}] (n={n}), one-sided p={p:.4f}, Holm {p_adj:.4f}{extra}')
         print(f'      direction supported: {direction and p_adj < .05} | magnitude met: {magnitude}')
+
+    domains = sorted({r['domain'] for r in rows if r.get('domain')})
+    if len(domains) > 1:
+        print('\nDESCRIPTIVE: per environment (leak; the three contrasts, 95% CI over that environment\'s customers)')
+        for d in domains:
+            sub = [r for r in rows if r['domain'] == d]
+            leaks = '  '.join(f"{c.removeprefix('public-')} {pct(sum(bool(r[LEAK]) for r in sub if r['condition'] == c) / max(1, sum(r['condition'] == c for r in sub)))}"
+                              for c in sorted({r['condition'] for r in sub}))
+            print(f'  {d:<9} {leaks}')
+            for name, key, a, b, _, _ in HYPOTHESES:
+                mean, lo, hi, _, n = boot(by_customer(sub, a, key, b), min(resamples, 2000))
+                print(f'  {"":<9}   {name.split()[0]}: {mean:+.3f} [{lo:+.3f}, {hi:+.3f}] (n={n})')
 
     print('\nDESCRIPTIVE: per wording (leak / partial read)')
     for c in sorted({r['condition'] for r in rows}):
