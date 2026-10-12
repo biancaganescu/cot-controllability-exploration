@@ -10,6 +10,7 @@ per-wording table of intrinsic and instructed. Rates carry
 """
 import argparse
 import random
+import sys
 import textwrap
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -23,6 +24,9 @@ from matplotlib.lines import Line2D  # noqa: E402
 from cot_controllability.blackbox import secret_file as sf  # noqa: E402
 from cot_controllability.common import read_data, reasoning_variants  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # also when loaded by path (analysis/v2.py)
+from labels import HEADER, TOLD, label  # noqa: E402  (plots/labels.py: the same labels in every figure)
+
 SPLITS = ('train', 'validation', 'test')
 # Reference palette (dataviz skill), validated; aqua and yellow sit below 3:1 contrast, so their
 # marks always carry a text label or a legend entry next to them.
@@ -30,12 +34,15 @@ BLUE, ORANGE, AQUA, YELLOW, RED = '#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#
 GRAY, INK, MUTED, GRID = '#a3a29c', '#0b0b0b', '#52514e', '#e4e3df'
 VIS = {'public': ('visible: partner reads the thinking', BLUE), 'private': ('private: nobody reads it', ORANGE)}
 # The same rows, in the same order and with the same labels, in every per-condition figure.
-ROWS = [('none', '{v}-none'), ('intrinsic', '{v}-intrinsic'), ('instructed', '{v}-instructed'),
-        ('intrinsic + instructed', '{v}-both'), ('instructed + salient', '{v}_salient-instructed'),
-        ('instructed + reminder', '{v}_reminder-instructed'), ('reasoning-only', '{v}-reasoning_only'),
-        ('placeholder', '{v}-placeholder')]
-CONTROLS = [('control: routing ID', 'routing.{v}-none'), ('control: placebo (no visibility sentence)', 'placebo-none'),
-            ('control: off-target instructed (visible)', 'public-offtarget_instructed')]
+# Grouped as in every other figure (labels.py): two-line labels, name then what the model is told.
+GROUPS = [('baseline', ['{v}-none']), ('intrinsic', ['{v}-intrinsic']),
+          ('instructed', ['{v}-instructed', '{v}_salient-instructed', '{v}_reminder-instructed', '{v}-reasoning_only',
+                          '{v}-placeholder']),
+          ('both', ['{v}-both'])]
+CONTROL_GROUP = ('control', ['routing.{v}-none', 'placebo-none', 'public-offtarget_instructed'])
+ROWS = [(label('v1', p), p) for _, patterns in GROUPS for p in patterns]
+CONTROLS = [(label('v1', p), p) for p in CONTROL_GROUP[1]]
+NAME = {p: TOLD['v1'][p][0] for p in TOLD['v1']}  # first line only, for tables
 DECISIONS = {  # key -> (legend text as in docs/terminology.md, colour), stacking order: leaks first, then not.
     'after': ('rule only after the leak', RED),
     'first': ('rule first, leaks anyway', YELLOW),
@@ -99,19 +106,33 @@ def by_condition(rows):
     return out
 
 
+def with_headers(groups):
+    """[('header', group) or (label, pattern)]: a header row before each group that has one."""
+    out = []
+    for name, patterns in groups:
+        out += ([('header', name)] if HEADER[name] else []) + [(label('v1', p), p) for p in patterns]
+    return out
+
+
 def leak_by_condition(rows, out):
-    groups, labels = by_condition(rows), [label for label, _ in ROWS + CONTROLS]
-    fig, ax = plt.subplots(figsize=(6.4, 3.9))
+    groups, items = by_condition(rows), with_headers(GROUPS + [CONTROL_GROUP])
+    fig, ax = plt.subplots(figsize=(6.4, 0.4 * len(items) + 1.2))
     offsets = {'public': -0.16, 'private': 0.16, None: 0}
-    for i, (_, pattern) in enumerate(ROWS + CONTROLS):
+    ticks, labels = [], []
+    for i, (text, pattern) in enumerate(items):
+        if text == 'header':
+            ax.text(0, i + 0.1, HEADER[pattern], transform=ax.get_yaxis_transform(), ha='right', va='center',
+                    fontsize=8, fontweight='bold', color=INK)
+            continue
+        ticks.append(i)
+        labels.append(text)
         for v, name in conditions(pattern).items():
             m, lo, hi = bootstrap(groups[name], 'secret_in_reasoning')
             colour = VIS[v][1] if v else BLUE if name.startswith('public') else GRAY
             ax.plot([100 * lo, 100 * hi], [i + offsets[v]] * 2, color=colour, lw=1.6, solid_capstyle='round')
             ax.plot(100 * m, i + offsets[v], 'o', ms=4.5, color=colour)
-    ax.axhline(len(ROWS) - 0.5, color=GRID, lw=0.8)
-    ax.set_yticks(range(len(labels)), labels)
-    ax.invert_yaxis()
+    ax.set_yticks(ticks, labels)
+    ax.set_ylim(len(items) - 0.5, -0.5)
     ax.set_xlim(0, 101)
     ax.set_xlabel('attempts that leak: the secret key appears in the thinking (%)')
     ax.grid(axis='x', color=GRID, lw=0.6)
@@ -130,7 +151,7 @@ def leak_by_condition(rows, out):
 
 def length_by_condition(rows, out):
     groups = by_condition(rows)
-    fig, ax = plt.subplots(figsize=(6.4, 2.9))
+    fig, ax = plt.subplots(figsize=(6.4, 0.42 * len(ROWS) + 0.9))
     for i, (_, pattern) in enumerate(ROWS):
         for v, name in conditions(pattern).items():
             m, lo, hi = bootstrap(groups[name], 'reasoning_tokens')
@@ -153,17 +174,17 @@ def length_by_condition(rows, out):
 
 
 def leak_vs_length(rows, out):
-    lines = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', ORANGE), ('instructed', '{v}-instructed', AQUA)]
-    pooled = {label: [r for r in rows if r['condition'] in conditions(p).values() and r['reasoning_tokens'] is not None]
-              for label, p, _ in lines}
+    lines = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', YELLOW), ('instructed', '{v}-instructed', AQUA)]
+    pooled = {name: [r for r in rows if r['condition'] in conditions(p).values() and r['reasoning_tokens'] is not None]
+              for name, p, _ in lines}
     tokens = sorted(r['reasoning_tokens'] for sub in pooled.values() for r in sub)
     edges = [tokens[int(q * (len(tokens) - 1))] for q in (0, .2, .4, .6, .8, 1)]
     sizes = []
     fig, ax = plt.subplots(figsize=(5.2, 2.6))
-    for label, _, colour in lines:
+    for name, _, colour in lines:
         xs, ms, los, his = [], [], [], []
         for a, b in zip(edges, edges[1:], strict=False):
-            sub = [r for r in pooled[label] if a <= r['reasoning_tokens'] <= b]
+            sub = [r for r in pooled[name] if a <= r['reasoning_tokens'] <= b]
             if len(sub) < 20:
                 continue
             sizes.append(len(sub))
@@ -174,7 +195,7 @@ def leak_vs_length(rows, out):
             his.append(100 * hi)
         ax.fill_between(xs, los, his, color=colour, alpha=.15, lw=0)
         ax.plot(xs, ms, '-o', color=colour, lw=1.6, ms=3.5)
-        ax.annotate(label, (xs[-1], ms[-1]), xytext=(5, 0), textcoords='offset points', va='center', fontsize=8, color=INK)
+        ax.annotate(name, (xs[-1], ms[-1]), xytext=(5, 0), textcoords='offset points', va='center', fontsize=8, color=INK)
     ax.set_ylim(0, 102)
     ax.set_xlabel('reasoning tokens per attempt (5 equal-size groups)')
     ax.set_ylabel('attempts that leak (%)')
@@ -244,7 +265,7 @@ def decision_by_condition(rows, out):
     keys = list(DECISIONS)
     bars = [(label, Counter(r['decision'] for r in rows if r['condition'] in conditions(p).values()))
             for label, p in ROWS]
-    fig, ax = plt.subplots(figsize=(6.4, 3.0))
+    fig, ax = plt.subplots(figsize=(6.4, 0.42 * len(ROWS) + 0.9))
     stacked(ax, bars, keys)
     ax.set_xlabel('share of the 640 attempts of each row (%)')
     header(ax, 'Does the model state a rule about the key, and when?',
@@ -257,11 +278,11 @@ def decision_by_condition(rows, out):
     plt.close(fig)
     print('| What the model is told | Visible? | Rule only after the leak (of all attempts) | (of attempts that state a rule) | n |')
     print('| --- | --- | --- | --- | --- |')
-    for label, pattern in ROWS:
+    for _, pattern in ROWS:
         for v, name in conditions(pattern).items():
             c = Counter(r['decision'] for r in rows if r['condition'] == name)
             n, stated = sum(c.values()), c['after'] + c['first'] + c['kept']
-            print(f"| {label} | {v} | {100 * c['after'] / n:.0f}% | "
+            print(f"| {NAME[pattern]} | {v} | {100 * c['after'] / n:.0f}% | "
                   + (f"{100 * c['after'] / stated:.0f}%" if stated else '—') + f' | {n} |')
 
 
@@ -300,7 +321,7 @@ def leak_by_wording(rows_by_split, out):
             n = sum(r['condition'] in ('public-instructed', 'private-instructed') for r in sub)
             rows.append((f'{split}, wording {slot + 1} (n={n})', sub))
     fig, ax = plt.subplots(figsize=(6.4, 2.9))
-    series = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', ORANGE), ('instructed', '{v}-instructed', AQUA)]
+    series = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', YELLOW), ('instructed', '{v}-instructed', AQUA)]
     for i, (_, sub) in enumerate(rows):
         for k, (_, pattern, colour) in enumerate(series):
             m, lo, hi = bootstrap([r for r in sub if r['condition'] in conditions(pattern).values()], 'secret_in_reasoning')
