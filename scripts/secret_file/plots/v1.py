@@ -57,13 +57,13 @@ def header(ax, title, subtitle):
     ax.text(0, 1.01, subtitle, transform=ax.transAxes, fontsize=8, color=MUTED, va='bottom')
 
 
-def footnote(ax, text, pad=10):
+def footnote(ax, text, pad=10, width=125):
     """Where the numbers come from: placed `pad` points below everything drawn for `ax` (axis labels,
     legends), so it never overlaps them. Call right before saving."""
     fig = ax.figure
     fig.canvas.draw()
     bottom = ax.get_tightbbox(fig.canvas.get_renderer()).y0 - pad * fig.dpi / 72
-    ax.text(ax.get_position().x0, bottom / fig.bbox.height, textwrap.fill(text, 125), transform=fig.transFigure,
+    ax.text(ax.get_position().x0, bottom / fig.bbox.height, textwrap.fill(text, width), transform=fig.transFigure,
             fontsize=7, color=MUTED, va='top', ha='left')
 
 
