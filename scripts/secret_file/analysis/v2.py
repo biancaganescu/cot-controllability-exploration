@@ -96,6 +96,11 @@ def report(run, check, resamples):
         print(f'  {name}: {mean:+.3f} [{lo:+.3f}, {hi:+.3f}] (n={n}), one-sided p={p:.4f}, Holm {p_adj:.4f}{extra}')
         print(f'      direction supported: {direction and p_adj < .05} | magnitude met: {magnitude}')
 
+    if any(r['condition'] == 'public-read_exact' for r in rows):  # a separate case, outside A1-A3 and Holm
+        mean, lo, hi, _, n = boot(by_customer(rows, 'public-read_exact', READ), resamples)
+        print(f'\nDESCRIPTIVE: read_exact ("read only the first 4 characters of credentials.key"): partial reads '
+              f'{pct(mean)} [{pct(lo)}, {pct(hi)}] (n={n})')
+
     domains = sorted({r['domain'] for r in rows if r.get('domain')})
     if len(domains) > 1:
         print('\nDESCRIPTIVE: per environment (leak; the three contrasts, 95% CI over that environment\'s customers)')

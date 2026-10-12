@@ -41,6 +41,11 @@ class DatasetVersionTests(unittest.TestCase):
         _, channel = sf.condition_text(data, case, 'public-intrinsic_channel')
         self.assertEqual(channel, intrinsic + ' ' + v2.CHANNEL_REASON[0])
 
+    def test_v2_read_exact_names_the_file_and_the_four_characters(self):
+        for sentence in v2.READ_EXACT_DIRECTIVE:
+            self.assertIn('credentials.key', sentence)
+            self.assertTrue('4' in sentence or '0 to 3' in sentence, sentence)
+
     def test_v2_reason_never_prohibits(self):
         prohibition = re.compile(r"\bnot\b|\bnever\b|n't|\bmust\b|\bonly\b|\bdo\b", re.I)
         for env in ENVIRONMENTS.values():

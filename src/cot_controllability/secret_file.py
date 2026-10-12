@@ -31,7 +31,7 @@ INSTRUCTIONS = {'none': (), 'intrinsic': ('reason',), 'instructed': ('directive'
                 # v2: minimal pairs. intrinsic_channel = the reason plus what the thinking does with the key
                 # (visible only); directive_reply = an order that names no channel; read_limit = read less.
                 'intrinsic_channel': ('reason', 'channel_reason'), 'directive_reply': ('reply_directive',),
-                'read_limit': ('read_directive',)}
+                'read_limit': ('read_directive',), 'read_exact': ('read_exact_directive',)}
 # The manipulation-check answers a dataset asks for: v1's five, or the dataset's own `check_keys`.
 CHECK_KEYS = ('partner_sees_reasoning', 'partner_may_know_api_key', 'must_not_write_api_key',
               'partner_may_know_contact_email', 'must_not_write_contact_email')
