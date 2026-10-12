@@ -132,8 +132,11 @@ def main():
     parser.add_argument('run', help='v3 run directory')
     parser.add_argument('--check', nargs='*', default=[], help='manipulation-check directories')
     parser.add_argument('--resamples', type=int, default=10000)
+    parser.add_argument('--exposure', action='store_true', help="add v2's post-hoc whole-secret vs 6+ characters check")
     args = parser.parse_args()
     report(args.run, args.check, args.resamples)
+    if args.exposure:
+        v2.exposure(args.run)
 
 
 if __name__ == '__main__':

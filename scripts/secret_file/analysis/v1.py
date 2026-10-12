@@ -134,8 +134,16 @@ def main():
     parser.add_argument('run', help='run directory with *.trial.json.gz and run.json.gz')
     parser.add_argument('--check', help='manipulation-check summary JSON for the same split')
     parser.add_argument('--reference', default='outputs/qwen3-8b/validation', help='Qwen3-8B run for P3')
+    parser.add_argument('--exposure', action='store_true', help="add v2's post-hoc whole-secret vs 6+ characters check")
     args = parser.parse_args()
     report(args.run, args.check, args.reference)
+    if args.exposure:  # post-hoc, written after v3 (docs/terminology.md, "leak")
+        import importlib.util
+        from pathlib import Path
+        spec = importlib.util.spec_from_file_location('analysis_v2', Path(__file__).with_name('v2.py'))
+        v2 = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(v2)
+        v2.exposure(args.run)
 
 
 if __name__ == '__main__':
