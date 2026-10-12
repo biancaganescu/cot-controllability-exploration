@@ -2,7 +2,8 @@
 
 Descriptive, not part of the frozen analysis: leak rate and thinking length by condition, leaks at
 matched length, when the rule is stated relative to the leak (per condition and per split), and
-stability across splits. Also prints the per-condition "rule only after the leak" table. Rates carry
+leaks per wording of the condition sentences. Also prints the per-condition "rule only after the leak" table and the
+per-wording table of intrinsic and instructed. Rates carry
 95% CIs from a bootstrap over customers, as in analyze.py.
 
     uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/figures]
@@ -256,29 +257,54 @@ def timing(rows_by_split, out):
     plt.close(fig)
 
 
-def splits(rows_by_split, out):
-    lines = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', ORANGE), ('instructed', '{v}-instructed', AQUA),
-             ('intrinsic + instructed', '{v}-both', BLUE)]
-    fig, ax = plt.subplots(figsize=(5.2, 2.6))
-    for label, pattern, colour in lines:
-        stats = [bootstrap([r for r in rows_by_split[s] if r['condition'] in conditions(pattern).values()],
-                           'secret_in_reasoning') for s in SPLITS]
-        ms = [100 * m for m, _, _ in stats]
-        ax.fill_between(range(3), [100 * lo for _, lo, _ in stats], [100 * hi for _, _, hi in stats],
-                        color=colour, alpha=.15, lw=0)
-        ax.plot(range(3), ms, '-o', color=colour, lw=1.6, ms=3.5)
-        ax.annotate(label, (2, ms[-1]), xytext=(5, 0), textcoords='offset points', va='center', fontsize=8, color=INK)
-    ax.set_xticks(range(3), ['train\n16 customers', 'validation\n16 customers', 'test\n32 customers'])
-    ax.set_ylim(0, 102)
-    ax.set_ylabel('writes the key (%)')
-    ax.spines['left'].set_visible(True)
-    ax.tick_params(axis='y', left=True)
-    ax.grid(axis='y', color=GRID, lw=0.6)
+def leak_by_wording(rows_by_split, out):
+    """Leak rate per wording slot: intrinsic and instructed share the slot, so each row is the same customers."""
+    rows = []
+    for split in SPLITS:
+        slots = sorted({r['paraphrase']['instruction'] for r in rows_by_split[split]})
+        for slot in slots:
+            sub = [r for r in rows_by_split[split] if r['paraphrase']['instruction'] == slot]
+            rows.append((f'{split}, wording {slot + 1}', sub))
+    fig, ax = plt.subplots(figsize=(6.4, 2.9))
+    series = [('none', '{v}-none', GRAY), ('intrinsic', '{v}-intrinsic', ORANGE), ('instructed', '{v}-instructed', AQUA)]
+    for i, (_, sub) in enumerate(rows):
+        for k, (_, pattern, colour) in enumerate(series):
+            m, lo, hi = bootstrap([r for r in sub if r['condition'] in conditions(pattern).values()], 'secret_in_reasoning')
+            yy = i + (k - 1) * 0.2
+            ax.plot([100 * lo, 100 * hi], [yy, yy], color=colour, lw=1.6, solid_capstyle='round')
+            ax.plot(100 * m, yy, 'o', ms=4.5, color=colour)
+    for boundary in (1.5, 3.5):
+        ax.axhline(boundary, color=GRID, lw=0.8)
+    ax.set_yticks(range(len(rows)), [label for label, _ in rows])
+    ax.invert_yaxis()
+    ax.set_xlim(0, 101)
+    ax.set_xlabel('attempts that leak (%), visible + private')
+    ax.grid(axis='x', color=GRID, lw=0.6)
     ax.set_axisbelow(True)
-    header(ax, 'Do the results hold on new customers and wording?',
-           'Each split: new customers, new wording; band = 95% CI. Intrinsic varies most.')
-    fig.savefig(out / 'splits.png')
+    header(ax, 'Every wording, on the same customers',
+           'Each row: the same customers, one wording of each sentence (none = baseline); bar = 95% CI.')
+    handles = [Line2D([], [], color=c, marker='o', ms=5, lw=0) for _, _, c in series]
+    ax.legend(handles, [name for name, _, _ in series], loc='lower right', bbox_to_anchor=(1, 1.2), ncol=3,
+              frameon=False, fontsize=8, handletextpad=0.3, columnspacing=1.2, borderaxespad=0)
+    fig.savefig(out / 'leak_by_wording.png')
     plt.close(fig)
+
+
+def wording_table(rows_by_split):
+    """Print leak and rule rates per wording of intrinsic and instructed, visible + private pooled."""
+    data = sf.load_data()
+    print('\n| Split | Condition | Wording | States a rule | Leaks | n |')
+    print('| --- | --- | --- | --- | --- | --- |')
+    for split in SPLITS:
+        for cond, sentences in (('intrinsic', data['reason']), ('instructed', data['directive'])):
+            by = defaultdict(list)
+            for r in rows_by_split[split]:
+                if r['condition'] in (f'public-{cond}', f'private-{cond}'):
+                    by[r['paraphrase']['instruction']].append(r)
+            for slot, rs in sorted(by.items()):
+                rule = sum(bool(r['rule_verbalized']) for r in rs) / len(rs)
+                leak = sum(bool(r['secret_in_reasoning']) for r in rs) / len(rs)
+                print(f'| `{split}` | {cond} | "{sentences[slot]}" | {100 * rule:.0f}% | {100 * leak:.0f}% | {len(rs)} |')
 
 
 def main():
@@ -297,7 +323,8 @@ def main():
     leak_vs_length(test, args.out)
     decision_by_condition(test, args.out)
     timing(rows_by_split, args.out)
-    splits(rows_by_split, args.out)
+    leak_by_wording(rows_by_split, args.out)
+    wording_table(rows_by_split)
     print('wrote', ', '.join(sorted(p.name for p in args.out.glob('*.png'))))
 
 

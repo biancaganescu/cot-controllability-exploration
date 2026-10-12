@@ -37,8 +37,8 @@ unfiltered restatement of what the model reads: good for monitoring. With a plai
 CoT-Control reports for formatting rules, plausibly because the task is easy and the secret unnecessary.
 
 **Limits.** One invented scenario (splits differ in surface, not task), one model family, a secret
-the task never needs; intrinsic's effect depends on its wording (train 52–69%, validation 85–89%,
-test 71–82%). Pre-registered analysis; Holm correction and mixed-effects model not run.
+the task never needs; the size of both effects depends on the wording of one sentence (instructed:
+26% vs 58% on the two test wordings), though instructed < intrinsic holds for all six. Pre-registered analysis; Holm correction and mixed-effects model not run.
 
 **Next.** White-box on the same trajectories: (W1) is instructed a late, word-specific filter in the
 last layers? (W2) can a probe predict a leak before it is written? (W3) do Oracle Lens / NLAs show

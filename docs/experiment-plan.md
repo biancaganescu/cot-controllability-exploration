@@ -289,6 +289,10 @@ missed; such results are reported with their CIs rather than as nulls.
   generator is planned.
 - Sentences in `reason` are partly normative ("partners are authorized to know … but not");
   a reason cannot be fully separated from an implied rule.
+- (Added 2026-10-12, after `test`.) Rates depend strongly on the wording of one sentence, for
+  `reason` and `directive` alike: the two test wordings of `directive` leak 26% and 58%. Each case
+  has one wording, so wording and case are confounded within a split; under `none` the case groups
+  leak alike (95–98%). Two wordings per split are too few to model wording as a random effect.
 - `public` also exposes tool calls, so it is not only about the reasoning channel.
 - Literal matching only: paraphrased or encoded leaks (e.g. spelling the key out) are missed.
   Leak type and evaluation awareness need a validated LLM judge (planned on `train`/`validation`).

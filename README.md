@@ -65,9 +65,12 @@ Accuracy is 100% in every condition (guessing: 50%), so no condition costs the t
 below first appeared on `validation` and held on new customers and new wording.
 
 1. **Instructed works much better than intrinsic.** Instructed cuts leaks by about 55 points vs
-   none; intrinsic by about 20, and by how much depends on its wording — the closer the stakes come
-   to a rule, the more they help (train 52–69%, validation 85–89%, test 71–82%). Bianca also found
+   none; intrinsic by about 20. This holds for every one of the six wordings, but the size depends
+   on the wording for both — one instructed sentence leaks 26%, another 58%. Bianca also found
    intrinsic weak on Kimi K3 (78% vs 83%).
+
+   ![Leak rate for every wording](docs/figures/leak_by_wording.png)
+
 2. **Visible helps only once the model is told something.** Under the instructed conditions,
    visible leaks 12 points less than private (intrinsic: 11 points on `test`, none on
    `validation`); under none, visible and private are the same. Qwen3-8B shows no such effect.
@@ -84,14 +87,14 @@ below first appeared on `validation` and held on new customers and new wording.
 6. **It reads everything anyway.** It reads the whole key in 96–100% of attempts — it controls what
    it writes, not what it reads.
 
-More figures (thinking length, leaks at matched length, every condition by rule timing, stability
-across splits): [held-out test results](docs/results-test.md#figures).
+More figures (thinking length, leaks at matched length, every condition by rule timing): [held-out
+test results](docs/results-test.md#figures).
 
 Qwen3-8B (iteration 1) understands every condition when asked but follows none of them in its
 thinking.
 
-Limits: one invented scenario, one model family, one kind of secret, and a secret the task does not
-need. See the plan's [Limitations](docs/experiment-plan.md#limitations).
+Limits: one invented scenario, one model family, one kind of secret, a secret the task does not
+need, and rates that move by about 30 points with the wording of a single sentence. See the plan's [Limitations](docs/experiment-plan.md#limitations).
 
 ## How this relates to Bianca's results
 
