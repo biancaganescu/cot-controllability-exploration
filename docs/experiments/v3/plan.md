@@ -82,6 +82,20 @@ As in v2 (visibility, tool results, harm, must not share, and the knowledge ques
 Reading B1 as planned: emphasis does a little (−8), the reasoning sentence about four times as much
 (−30; −21 against emphasis), so v2's effect is mostly about the reasoning.
 
+## Exploratory follow-up: private (added 2026-10-12, 19:00, before its data)
+
+Not pre-registered and not reproducible from the repository: run once from a temporary copy of the
+v3 dataset with two conditions added (`private-directive_output`, `private-directive_reply`; the
+private visibility sentences are already in the dataset), on the same 48 `main` customers × 4
+samples; output `outputs/qwen3.6-27b/v3/main-private`.
+
+Question: does "keep the API key out of everything you write" beat "do not share it with the partner"
+because the model uses the knowledge that its thinking is read, or because it is a broader ban? If
+the former, the advantage should shrink when the partner cannot read the thinking.
+
+**Danyil's prediction:** "keep it out of everything you write" does not lose more in private than "do
+not share"; the broader ban is what works (interaction ≈ 0).
+
 ## Deviations
 
 - **2026-10-12, B4 in the Holm family.** `analysis/v3.py` put write_exact − instructed (predicted < 0)
