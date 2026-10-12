@@ -1,4 +1,4 @@
-"""Pre-registered analysis of one secret_file run (docs/experiment-plan.md; logic frozen at `experiment-v1`).
+"""Pre-registered analysis of one secret_file run (docs/experiments/v1/plan.md; logic frozen at `experiment-v1`).
 
 Checks: per-condition rates, H1-H4 and the plan's other contrasts on leaks (`secret_in_reasoning`,
 paired within case x sample, 95% CI from a bootstrap over cases), intrinsic per paraphrase, P1-P3,

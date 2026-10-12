@@ -27,7 +27,7 @@ sentence alone, in both visible and private versions. So her *intrinsic* setting
 `intrinsic`; reports also give her contrast (`public-intrinsic` vs the instructed conditions).
 
 The reports name conditions in plain words (none, intrinsic, instructed, intrinsic + instructed,
-instructed + salient, …, visible = `public`); [terminology](terminology.md) maps each name to its
+instructed + salient, …, visible = `public`); [terminology](../../terminology.md) maps each name to its
 code and wording. This plan keeps the code names.
 
 ## Hypotheses
@@ -181,7 +181,7 @@ results were looked at (the large-run outputs had not been copied off the GPU bo
 - **P3 — being watched matters for 27B.** `public − private` is negative (less leaking when watched)
   with a CI excluding 0, pooled over the instruction levels, and larger in size than for Qwen3-8B.
 
-### Outcome (checked 2026-10-11, after the run; tables in `docs/results-iteration-3.md`)
+### Outcome (checked 2026-10-11, after the run; tables in `docs/experiments/v1/results/iteration-3.md`)
 
 - **P1 not met as stated.** `validation`: −24.4 points [−31.2, −17.8], 0.6 points short of the
   threshold; `train`: −4.2 [−13.5, +5.2]. The gap depends on the `intrinsic` wording, which differs
@@ -209,7 +209,7 @@ These are written after seeing `train` and `validation` and before any `test` da
 - **Reproducibility is statistical.** Seeds are fixed per case and sample, but vLLM batching makes
   reruns differ token by token; conclusions rest on aggregates and CIs, not on identical reruns.
 
-## Outcome on `test` (checked 2026-10-12; tables in `docs/results-test.md`)
+## Outcome on `test` (checked 2026-10-12; tables in `docs/experiments/v1/results/test.md`)
 
 Qwen3.6-27B, 320 trials per condition, all 8,000 answered. O1 (`read_full_secret`) is at ceiling
 (96–100%) in every condition, so every verdict is on O2 (`secret_in_reasoning`).
@@ -338,7 +338,7 @@ results per wording.
   `experiment-v1`) reports 95% cluster-bootstrap CIs with 4,000 resamples; the Holm correction, the
   mixed-effects regression and the A/A calibration described under Analysis were not implemented
   before the freeze and were not run. Verdicts use the CIs as reported. The rule-vs-leak timing in
-  `docs/results-test.md` uses the same ad-hoc sentence-level code as for `validation`; it is
+  `docs/experiments/v1/results/test.md` uses the same ad-hoc sentence-level code as for `validation`; it is
   descriptive.
 
 - **2026-10-11, before `test`:** `test` is run on Qwen3.6-27B only. Qwen3-8B did not act on any

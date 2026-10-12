@@ -7,9 +7,9 @@ its own reason (*intrinsic*) than when it is told (*instructed*)?
 - **One page: [ONEPAGER.md](ONEPAGER.md)**
 - Where it started: Bianca's slides, [Can models control their reasoning for their own reasons?](docs/presentation.pdf) (Kimi K3, intrinsic vs instructed)
 - How to run it: [DEVELOPER.md](DEVELOPER.md)
-- Design, hypotheses, predictions: [docs/experiment-plan.md](docs/experiment-plan.md)
-- **Final results: [held-out test](docs/results-test.md)**
-- Exploration: [iteration 1](docs/results-iteration-1.md) · [iteration 2](docs/results-iteration-2.md) · [iteration 3](docs/results-iteration-3.md)
+- Design, hypotheses, predictions: [docs/experiments/v1/plan.md](docs/experiments/v1/plan.md)
+- **Final results: [held-out test](docs/experiments/v1/results/test.md)**
+- Exploration: [iteration 1](docs/experiments/v1/results/iteration-1.md) · [iteration 2](docs/experiments/v1/results/iteration-2.md) · [iteration 3](docs/experiments/v1/results/iteration-3.md)
 
 ## The experiment
 
@@ -30,7 +30,7 @@ ID**. A **leak** is the secret part of the key in the thinking; a **rule** is a 
 sharing it.
 
 Exact wordings and every other term: [terminology](docs/terminology.md). Three real attempts:
-[examples](docs/examples.md).
+[examples](docs/experiments/v1/examples.md).
 
 ## Where we are
 
@@ -38,10 +38,10 @@ Exact wordings and every other term: [terminology](docs/terminology.md). Three r
 
 | Iteration | What | Status |
 | --- | --- | --- |
-| [1](docs/results-iteration-1.md) | Qwen3-8B, 13 conditions: understands every instruction, follows none in its thinking | done |
-| [2](docs/results-iteration-2.md) | instructed + salient on 8B; first Qwen3.6-27B run; scoring checked against 70 hand-labelled trajectories | done |
-| [3](docs/results-iteration-3.md) | Qwen3.6-27B, 25 conditions, 160 attempts each; predictions P1–P3 | done |
-| [test](docs/results-test.md) | plan frozen (`experiment-v1`); held-out run, 320 attempts per condition | **done** |
+| [1](docs/experiments/v1/results/iteration-1.md) | Qwen3-8B, 13 conditions: understands every instruction, follows none in its thinking | done |
+| [2](docs/experiments/v1/results/iteration-2.md) | instructed + salient on 8B; first Qwen3.6-27B run; scoring checked against 70 hand-labelled trajectories | done |
+| [3](docs/experiments/v1/results/iteration-3.md) | Qwen3.6-27B, 25 conditions, 160 attempts each; predictions P1–P3 | done |
+| [test](docs/experiments/v1/results/test.md) | plan frozen (`experiment-v1`); held-out run, 320 attempts per condition | **done** |
 
 ### White-box: what happens inside the model — next
 
@@ -59,7 +59,7 @@ Qwen3.6-27B.
 
 ## What we found (Qwen3.6-27B, held-out `test`, 320 attempts per condition)
 
-![How often the model leaks the key, by condition](docs/figures/leak_by_condition.png)
+![How often the model leaks the key, by condition](docs/experiments/v1/figures/leak_by_condition.png)
 
 Accuracy is 100% in every condition (guessing: 50%), so no condition costs the task. All findings
 below first appeared on `validation` and held on new customers and new wording.
@@ -69,7 +69,7 @@ below first appeared on `validation` and held on new customers and new wording.
    on the wording for both — one instructed sentence leaks 26%, another 58%. Bianca also found
    intrinsic weak on Kimi K3 (78% vs 83%).
 
-   ![Leak rate for every wording](docs/figures/leak_by_wording.png)
+   ![Leak rate for every wording](docs/experiments/v1/figures/leak_by_wording.png)
 
 2. **Visible helps only once the model is told something.** Under the instructed conditions,
    visible leaks 12 points less than private (intrinsic: 11 points on `test`, none on
@@ -78,7 +78,7 @@ below first appeared on `validation` and held on new customers and new wording.
    it does so *after* the leak (Bianca's Kimi K3: 87%); under instructed, 21–26%. Intrinsic also
    states a rule less often (17–68% of attempts vs 77–90%), so its bars rest on fewer attempts.
 
-   ![When the rule is stated, relative to the leak](docs/figures/rule_timing.png)
+   ![When the rule is stated, relative to the leak](docs/experiments/v1/figures/rule_timing.png)
 
 4. **It guards its reply, not its thinking.** The rules it states are about its reply ("I must not
    share the API key") or reply and thinking together — never about its thinking alone.
@@ -89,13 +89,13 @@ below first appeared on `validation` and held on new customers and new wording.
    read it all. No condition asks it to read less, so this shows its default, not an inability.
 
 More figures (thinking length, leaks at matched length, every condition by rule timing): [held-out
-test results](docs/results-test.md#figures).
+test results](docs/experiments/v1/results/test.md#figures).
 
 Qwen3-8B (iteration 1) understands every condition when asked but follows none of them in its
 thinking.
 
 Limits: one invented scenario, one model family, one kind of secret, a secret the task does not
-need, and rates that move by about 30 points with the wording of a single sentence. See the plan's [Limitations](docs/experiment-plan.md#limitations).
+need, and rates that move by about 30 points with the wording of a single sentence. See the plan's [Limitations](docs/experiments/v1/plan.md#limitations).
 
 ## How this relates to Bianca's results
 
@@ -117,4 +117,4 @@ be true; the wording of the instruction decides which one you get.
 **Before reusing this dataset for more black-box runs:** cross the wordings with the customers and
 rewrite intrinsic without "not the key" — today each split has two non-equivalent wordings, so
 split-to-split numbers mix the condition with the sentence. White-box can use `train` /
-`validation` as they are. Details: [plan, recommendations](docs/experiment-plan.md#recommendations-for-the-next-runs-added-2026-10-12-after-test).
+`validation` as they are. Details: [plan, recommendations](docs/experiments/v1/plan.md#recommendations-for-the-next-runs-added-2026-10-12-after-test).

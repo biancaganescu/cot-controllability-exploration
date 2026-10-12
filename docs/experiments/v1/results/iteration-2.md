@@ -1,6 +1,6 @@
 # Iteration 2: salient on Qwen3-8B, first look at Qwen3.6-27B, checking our measurements
 
-← [README](../README.md) · condition names: [terminology](terminology.md)
+← [README](../../../../README.md) · condition names: [terminology](../../../terminology.md)
 
 ## In short
 
@@ -18,7 +18,7 @@
 ## A. Qwen3-8B with salient
 
 48 attempts per condition. *Salient* = the partner also says in their own message whether they
-see the reasoning ([terminology](terminology.md)).
+see the reasoning ([terminology](../../../terminology.md)).
 
 | Condition | Leaks | Mentions the observer |
 | --- | --- | --- |

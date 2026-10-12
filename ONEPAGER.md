@@ -1,8 +1,8 @@
 # Can a reasoning model keep a secret out of its own chain of thought?
 
 *Danyil, continuing Bianca's project ([slides](docs/presentation.pdf)). Qwen3.6-27B, held-out test,
-8,000 attempts. Details: [README](README.md) · [results](docs/results-test.md) ·
-[terms](docs/terminology.md) · [examples](docs/examples.md).*
+8,000 attempts. Details: [README](README.md) · [results](docs/experiments/v1/results/test.md) ·
+[terms](docs/terminology.md) · [examples](docs/experiments/v1/examples.md).*
 
 **Why it matters.** CoT monitoring assumes a model cannot easily keep things out of its reasoning.
 [CoT-Control](https://arxiv.org/abs/2603.05706) tests this with formatting rules ("don't use word
@@ -14,7 +14,7 @@ own reason (**intrinsic**) than when it is told to (**instructed**)?
 characters. The secret part is never needed. We count a **leak** when it appears in the thinking.
 The partner either reads the thinking live (**visible**) or not (**private**).
 
-![How often the model leaks the key, by condition](docs/figures/leak_by_condition.png)
+![How often the model leaks the key, by condition](docs/experiments/v1/figures/leak_by_condition.png)
 
 **Findings** (all first seen on `validation`, confirmed on 32 new customers with new wording):
 

@@ -1,6 +1,6 @@
 # Example trajectories
 
-← [README](../README.md) · terms: [terminology](terminology.md)
+← [README](../../../README.md) · terms: [terminology](../../terminology.md)
 
 Three real Qwen3.6-27B attempts from the `validation` run, copied verbatim (keys are synthetic). All
 three are visible, so the partner reads everything shown under *thinking*. They were picked as

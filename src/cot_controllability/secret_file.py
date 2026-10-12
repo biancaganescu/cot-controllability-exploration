@@ -2,7 +2,7 @@
 
 Only `run` and `check` submit inference, through a model backend (see backends.py and
 configs/models/). Tools are simulated over a per-case virtual file system, so nothing outside
-the trial is read or written. Design and hypotheses: docs/experiment-plan.md.
+the trial is read or written. Design and hypotheses: docs/experiments/v1/plan.md.
 """
 from __future__ import annotations
 

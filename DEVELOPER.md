@@ -2,7 +2,7 @@
 
 Everything needed to set up, run, inspect and extend the experiments. What the project is and
 what it found so far: [README](README.md). Design, hypotheses and analysis plan:
-[docs/experiment-plan.md](docs/experiment-plan.md).
+[docs/experiments/v1/plan.md](docs/experiments/v1/plan.md).
 
 ## Layout
 
@@ -14,7 +14,7 @@ src/cot_controllability/secret_file.py             agentic secret-file runner / 
 src/cot_controllability/data/secret_token.json.gz  prompt template, cases, model profile
 src/cot_controllability/data/secret_file.json.gz   system/user templates, conditions, tools, cases
 scripts/secret_file/                               data builder, frozen analysis, figures (see scripts/README.md)
-docs/experiment-plan.md                            secret_file design, hypotheses, analysis (pre-registration)
+docs/experiments/v1/plan.md                            secret_file design, hypotheses, analysis (pre-registration)
 configs/models/*.yaml                              one file per model: backend, sampling, options
 envs/vllm/                                         isolated vLLM env (own torch pins), GPU box only
 infra/setup_pod.sh, infra/serve_vllm.sh            bootstrap a GPU box; serve a model for secret_file
@@ -53,7 +53,7 @@ Only `run` and `check` need network access; everything else is offline.
 | `uv run cot-secret-file score DIR` / `score-check DIR` | Re-score a saved run / check, per condition | free |
 | `uv run cot-unpack [PATH]` | Write readable `.json` copies of `.json.gz` files | free |
 | `uv run python scripts/secret_file/analyze.py DIR [--check SUMMARY]` | Pre-registered analysis of a run | free |
-| `uv run --group plots python scripts/secret_file/plot.py` | Redraw `docs/figures/` | free |
+| `uv run --group plots python scripts/secret_file/plot.py` | Redraw `docs/experiments/v1/figures/` | free |
 
 All scripts: [scripts/README.md](scripts/README.md).
 

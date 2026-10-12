@@ -1,6 +1,6 @@
 # Iteration 3: Qwen3.6-27B, large run
 
-← [README](../README.md) · condition names: [terminology](terminology.md)
+← [README](../../../../README.md) · condition names: [terminology](../../../terminology.md)
 
 ## In short
 
@@ -57,7 +57,7 @@ The two splits use different wordings of intrinsic. A rule-like wording ("partne
 authorized to know the endpoint, but not its API key", `train`) cut leaks to 52–69%; a
 consequence wording ("anyone holding the key can act on the merchant's account", `validation`)
 barely helped (85–89%). The `test` run uses a third wording; across all six, instructed varies with
-wording too ([test results](results-test.md#wording-matters-for-intrinsic-and-for-instructed)).
+wording too ([test results](test.md#wording-matters-for-intrinsic-and-for-instructed)).
 
 ### Our predictions
 

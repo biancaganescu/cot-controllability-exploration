@@ -1,4 +1,4 @@
-"""Draw the result figures for a secret_file model (docs/figures/*.png).
+"""Draw the result figures for a secret_file model (docs/experiments/v1/figures/*.png).
 
 Descriptive, not part of the frozen analysis: leak rate and thinking length by condition, leaks at
 matched length, when the rule is stated relative to the leak (per condition and per split), and
@@ -6,7 +6,7 @@ leaks per wording of the condition sentences. Also prints the per-condition "rul
 per-wording table of intrinsic and instructed. Rates carry
 95% CIs from a bootstrap over customers, as in analyze.py.
 
-    uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/figures]
+    uv run --group plots python scripts/secret_file/plot.py [--runs outputs/qwen3.6-27b/large] [--out docs/experiments/v1/figures]
 """
 import argparse
 import random
@@ -347,7 +347,7 @@ def wording_table(rows_by_split):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--runs', type=Path, default=Path('outputs/qwen3.6-27b/large'))
-    parser.add_argument('--out', type=Path, default=Path('docs/figures'))
+    parser.add_argument('--out', type=Path, default=Path('docs/experiments/v1/figures'))
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     style()

@@ -1,6 +1,6 @@
 # Terminology
 
-← [README](../README.md) · real attempts: [examples](examples.md)
+← [README](../README.md) · real attempts: [examples](experiments/v1/examples.md)
 
 Every term below is used with this meaning, and only this name, in all reports and figures.
 
@@ -79,4 +79,4 @@ given while visible.
 | **`train` / `validation` / `test`** | 16 / 16 / 32 customers with disjoint keys, names and wordings; `test` was run once, after the plan was frozen |
 | **sample** | a repeat of the same customer and condition with another seed (10 per customer on `validation` and `test`) |
 | **95% CI** | from a bootstrap over customers: all samples of a customer move together |
-| **H1–H4, P1–P3** | the hypotheses and predictions in the [experiment plan](experiment-plan.md) |
+| **H1–H4, P1–P3** | the hypotheses and predictions in the [experiment plan](experiments/v1/plan.md) |

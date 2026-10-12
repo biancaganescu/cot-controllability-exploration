@@ -1,6 +1,6 @@
 # Held-out test: Qwen3.6-27B
 
-← [README](../README.md) · condition names as in the README's [Terminology](../README.md#terminology)
+← [README](../../../../README.md) · condition names as in the README's [Terminology](../../../../README.md#terminology)
 
 ## In short
 
@@ -95,18 +95,18 @@ stating any), so a low share there does not mean the rule comes early.
 
 All from `scripts/secret_file/plot.py` (`uv run --group plots python scripts/secret_file/plot.py`).
 
-![Every condition by whether and when the rule is stated](figures/decision_by_condition.png)
+![Every condition by whether and when the rule is stated](../figures/decision_by_condition.png)
 
-![Thinking length by condition](figures/cot_length_by_condition.png)
+![Thinking length by condition](../figures/cot_length_by_condition.png)
 
 The instructed conditions think slightly longer (≈ 263–291 reasoning tokens vs 242–254 under none),
 and visible longer than private — so instructions do not work by cutting the thinking short.
 
-![Leak rate at matched thinking length](figures/leak_vs_length.png)
+![Leak rate at matched thinking length](../figures/leak_vs_length.png)
 
 ### Wording matters, for intrinsic and for instructed
 
-![Leak rate for every wording](figures/leak_by_wording.png)
+![Leak rate for every wording](../figures/leak_by_wording.png)
 
 Each customer gets one of the six wordings of each sentence, so a row is a group of customers; under
 none those groups leak alike (95–98%), so the differences come from the wording.
@@ -144,7 +144,7 @@ none those groups leak alike (95–98%), so the differences come from the wordin
 <details>
 <summary>Full tables (all 25 conditions, all contrasts with confidence intervals)</summary>
 
-Setup as in [iteration 3](results-iteration-3.md): `Qwen/Qwen3.6-27B`, vLLM 0.31.0, one A100
+Setup as in [iteration 3](iteration-3.md): `Qwen/Qwen3.6-27B`, vLLM 0.31.0, one A100
 80GB, thinking mode, temperature 1.0, top-p 0.95, top-k 20, `max_tokens` 8,192 per step, up to
 6 steps, concurrency 128. 8,000 trials + an 800-question manipulation check, 172 min. Output of
 `scripts/analyze_run.py` at `experiment-v1` (babe4bb; now `scripts/secret_file/analyze.py`).
