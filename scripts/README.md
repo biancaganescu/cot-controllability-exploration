@@ -1,8 +1,8 @@
 # Scripts
 
 One folder per task; inside it one folder per kind of script (`datasets/`, `analysis/`, `plots/`) and
-one file per version. Post-hoc additions go into that version's file behind a flag, not into new files. Each script has a docstring (what, why, usage)
-and `--help`; run from the repo root. The task runners themselves are entry points
+one file per version. Post-hoc additions go into that version's file behind a flag, not into new
+files. Each script has a docstring (what, why, usage) and `--help`; run from the repo root. The task runners themselves are entry points
 (`cot-secret-file`, `cot-secret-token`, `cot-judge`, `cot-label`); see [DEVELOPER.md](../DEVELOPER.md).
 
 ## `secret_file/`
