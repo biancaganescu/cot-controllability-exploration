@@ -35,8 +35,8 @@ from v1 import (  # noqa: E402
 )
 from v1 import footnote as _footnote  # noqa: E402
 
-from cot_controllability import secret_file as sf  # noqa: E402
-from cot_controllability.environments import ENVIRONMENTS  # noqa: E402
+from cot_controllability.blackbox import secret_file as sf  # noqa: E402
+from cot_controllability.blackbox.environments import ENVIRONMENTS  # noqa: E402
 
 ROWS = [('none', 'public-none'), ('intrinsic', 'public-intrinsic'), ('intrinsic + channel', 'public-intrinsic_channel'),
         ('instructed', 'public-directive_reply'), ('instructed + channel', 'public-instructed'),

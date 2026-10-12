@@ -12,8 +12,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from cot_controllability import backends, common
-from cot_controllability import secret_file as sf
 from cot_controllability.backends import build_backend, load_model_config
+from cot_controllability.blackbox import secret_file as sf
 
 DUMMY_KEY = 'offline-demo-test-key-not-a-credential'
 PRICES = [1e-6, 2e-6]

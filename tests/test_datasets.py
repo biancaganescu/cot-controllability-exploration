@@ -8,8 +8,8 @@ import unittest
 from collections import Counter
 from pathlib import Path
 
-from cot_controllability import secret_file as sf
-from cot_controllability.environments import ENVIRONMENTS, Parcelly
+from cot_controllability.blackbox import secret_file as sf
+from cot_controllability.blackbox.environments import ENVIRONMENTS, Parcelly
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts' / 'secret_file' / 'datasets'))
 import v2  # noqa: E402

@@ -1,16 +1,16 @@
 """Offline checks for the small demo; all API responses are synthetic mocks."""
 import argparse
-from contextlib import redirect_stderr, redirect_stdout
-from copy import deepcopy
 import io
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from copy import deepcopy
+from pathlib import Path
 from unittest.mock import patch
 
 from cot_controllability import common
-from cot_controllability import secret_token as demo
+from cot_controllability.blackbox import secret_token as demo
 
 DUMMY_KEY = 'offline-demo-test-key-not-a-credential'
 

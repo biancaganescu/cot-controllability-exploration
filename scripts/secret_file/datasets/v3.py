@@ -32,8 +32,9 @@ from v2 import (
     hexdigits,
 )
 
-from cot_controllability import common, secret_file
-from cot_controllability.environments import ENVIRONMENTS
+from cot_controllability import common
+from cot_controllability.blackbox import secret_file
+from cot_controllability.blackbox.environments import ENVIRONMENTS
 
 OUT = secret_file.DATASETS / 'v3.json.gz'
 SEED = 20261013

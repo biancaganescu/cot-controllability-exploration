@@ -31,7 +31,7 @@ Kept from v1: the task mechanics (endpoint from the key's prefix), tools, file l
 (Qwen3.6-27B, vLLM 0.31.0, `configs/models/qwen3.6-27b-vllm.yaml`). Kept small on purpose — a
 mini-project: **visible conditions only**, 6 conditions.
 
-**Four environments** (`src/cot_controllability/environments.py`: a base `Environment` and one
+**Four environments** (`src/cot_controllability/blackbox/environments.py`: a base `Environment` and one
 subclass each) share those mechanics and differ in everything the model reads — company, partner,
 question, neighbouring files and the intrinsic reason (six wordings each):
 

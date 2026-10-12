@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from cot_controllability import judge as j
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
 from cot_controllability.common import read_data
 from cot_controllability.label import write_jsonl_gz
 

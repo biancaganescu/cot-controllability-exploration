@@ -1,6 +1,6 @@
 """Build dataset v2 of the secret_file task (src/cot_controllability/data/secret_file/v2.json.gz).
 
-Design: docs/experiments/v2/plan.md. Four environments (src/cot_controllability/environments.py)
+Design: docs/experiments/v2/plan.md. Four environments (src/cot_controllability/blackbox/environments.py)
 share v1's mechanics — an API key whose prefix picks a regional endpoint, behind the same tools and
 file layout — and differ in everything the model reads: company, partner, question, files and the
 intrinsic reason. Shared new sentences, the same in every environment:
@@ -20,8 +20,9 @@ import sys
 
 from v1 import ITEMS, TOOLS
 
-from cot_controllability import common, secret_file
-from cot_controllability.environments import ENVIRONMENTS
+from cot_controllability import common
+from cot_controllability.blackbox import secret_file
+from cot_controllability.blackbox.environments import ENVIRONMENTS
 
 OUT = secret_file.DATASETS / 'v2.json.gz'
 SEED = 20261012

@@ -20,7 +20,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
 
-from cot_controllability import secret_file as sf  # noqa: E402
+from cot_controllability.blackbox import secret_file as sf  # noqa: E402
 from cot_controllability.common import read_data, reasoning_variants  # noqa: E402
 
 SPLITS = ('train', 'validation', 'test')

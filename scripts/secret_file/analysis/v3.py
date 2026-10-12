@@ -17,7 +17,7 @@ import importlib.util
 from collections import defaultdict
 from pathlib import Path
 
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
 
 _spec = importlib.util.spec_from_file_location('analysis_v2', Path(__file__).with_name('v2.py'))
 v2 = importlib.util.module_from_spec(_spec)

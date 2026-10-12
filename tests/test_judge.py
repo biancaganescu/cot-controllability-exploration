@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from cot_controllability import judge as j
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
 
 GOOD = {'reasoning': 'ok', 'rule_stated': 'yes', 'rule_channel': 'reply', 'key_mention': 'full',
         'leak_kind': 'restate', 'observer_mentioned': 'no', 'eval_aware': 'no'}

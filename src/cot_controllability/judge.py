@@ -26,9 +26,9 @@ from pathlib import Path
 
 import yaml
 
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
+from cot_controllability.blackbox.secret_file import run_parallel
 from cot_controllability.common import api_json, read_data, reasoning_variants
-from cot_controllability.secret_file import run_parallel
 
 JUDGE_DIR = Path(__file__).resolve().parents[2] / 'configs' / 'judge'
 CACHE = Path('.cache/judge.sqlite')

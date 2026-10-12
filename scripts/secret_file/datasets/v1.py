@@ -12,7 +12,8 @@ import random
 import secrets
 import sys
 
-from cot_controllability import common, secret_file
+from cot_controllability import common
+from cot_controllability.blackbox import secret_file
 
 SPLITS = {'train': ([0, 1], 16), 'validation': ([2, 3], 16), 'test': ([4, 5], 32)}
 

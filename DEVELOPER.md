@@ -9,8 +9,10 @@ what it found so far: [README](README.md). Design, hypotheses and analysis plan:
 ```
 src/cot_controllability/common.py                  canary, gzip I/O, OpenRouter, unpack
 src/cot_controllability/backends.py                model backends: OpenRouter (Kimi) or local vLLM
-src/cot_controllability/secret_token.py            original prompt-token runner / scorer
-src/cot_controllability/secret_file.py             agentic secret-file runner / scorer
+src/cot_controllability/blackbox/secret_token.py  original prompt-token runner / scorer
+src/cot_controllability/blackbox/secret_file.py   agentic secret-file runner / scorer
+src/cot_controllability/blackbox/environments.py  secret_file environments (v2+): base Environment, four settings
+src/cot_controllability/whitebox/                  replay trajectories through HF transformers; activations, J-lens, probes
 src/cot_controllability/data/secret_token.json.gz  prompt template, cases, model profile
 src/cot_controllability/data/secret_file.json.gz   system/user templates, conditions, tools, cases
 scripts/secret_file/                               data builder, frozen analysis, figures (see scripts/README.md)

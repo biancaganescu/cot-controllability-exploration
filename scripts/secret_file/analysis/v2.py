@@ -22,7 +22,7 @@ import random
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
 
 LEAK, READ = 'secret_in_reasoning', 'read_range_used'
 # (name, outcome, condition a, condition b or None, predicted direction, predicted magnitude range)

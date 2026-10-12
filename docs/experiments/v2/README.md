@@ -17,7 +17,7 @@ small → main. Frozen at tag `experiment-v2` before `main`. **Closed:** A1 not 
 | [examples.md](examples.md) | base prompts of the four environments and one real trajectory per condition |
 | [figures/](figures/) | per-environment figures, one folder per stage (`smoke/`, `small/`, `main/` — the final ones) — `scripts/secret_file/plots/v2.py` |
 
-Code: environments `src/cot_controllability/environments.py`, dataset
+Code: environments `src/cot_controllability/blackbox/environments.py`, dataset
 `scripts/secret_file/datasets/v2.py`, analysis `scripts/secret_file/analysis/v2.py`, stage runner
 `infra/run_stage.sh`.
 

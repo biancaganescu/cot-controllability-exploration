@@ -4,7 +4,7 @@
 
 Pre-registration for the agentic secret-file task. Written before any model run; any later
 change to hypotheses, outcomes or analysis is logged in [Deviations](#deviations) with a date
-and reason. Code: `src/cot_controllability/secret_file.py`; wording:
+and reason. Code: `src/cot_controllability/blackbox/secret_file.py`; wording:
 `scripts/secret_file/datasets/v1.py`.
 
 ## Question

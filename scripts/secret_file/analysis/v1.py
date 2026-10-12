@@ -13,7 +13,7 @@ import random
 import re
 from collections import Counter, defaultdict
 
-from cot_controllability import secret_file as sf
+from cot_controllability.blackbox import secret_file as sf
 from cot_controllability.common import read_data, reasoning_variants
 
 KEY = re.compile(r'\[KEY\]')
