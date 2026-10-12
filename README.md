@@ -110,3 +110,8 @@ be true; the wording of the instruction decides which one you get.
 2. Check the wording effect directly: our task with the key quoted in the instruction, and
    Bianca's task without it.
 3. Generalise: more scenarios and secret types, a secret the task partly needs, other models.
+
+**Before reusing this dataset for more black-box runs:** cross the wordings with the customers and
+rewrite intrinsic without "not the key" — today each split has two non-equivalent wordings, so
+split-to-split numbers mix the condition with the sentence. White-box can use `train` /
+`validation` as they are. Details: [plan, recommendations](docs/experiment-plan.md#recommendations-for-the-next-runs-added-2026-10-12-after-test).

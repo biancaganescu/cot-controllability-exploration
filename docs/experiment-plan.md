@@ -298,6 +298,37 @@ missed; such results are reported with their CIs rather than as nulls.
   Leak type and evaluation awareness need a validated LLM judge (planned on `train`/`validation`).
 - Self-hosted models run with fixed seeds; OpenRouter runs are not seeded.
 
+## Recommendations for the next runs (added 2026-10-12, after `test`)
+
+The paraphrase split did its job — instructed < intrinsic holds for all six wordings — but it
+cannot say how large the effects are for "intrinsic" or "instructed" in general:
+
+- The paraphrases were not equivalent. Some `reason` wordings end in an explicit prohibition
+  ("…but not its API key", "…not the key") and draw a rule in 60–83% of attempts; the `validation`
+  wordings describe consequences only and draw one in 3% and 30%. The manipulation check did not
+  catch this: the model answered "may the partner know the key? — no" for every wording.
+- With two wordings per split, a difference between splits (e.g. rule after the leak: 83% on
+  `validation`, 50% on `test`) is a difference between four sentences, not a test of
+  generalisation.
+
+**If this dataset is reused for more black-box runs** (new models, new conditions, rerunning
+`intrinsic`), fix this first — otherwise its numbers keep mixing the condition with the sentence:
+
+1. Cross wording with customers: every customer gets every wording (or a random one per sample);
+   splits differ only by customers. About 2 GPU hours on one A100 for none / intrinsic / instructed
+   × visible / private (≈ 4,600 attempts at the `test` run's pace).
+2. Rewrite `reason` so every wording gives a reason and consequences only, with no "not the key";
+   check equivalence before running (one manipulation check per wording, and a pilot of the rule
+   rate per wording).
+3. Report wording as a random effect (mixed model) next to the pooled rate.
+
+**For a new dataset** (other scenarios, AirGapAgent-R): build the same three points into the
+generator from the start; ≥ 6 wordings per sentence.
+
+**Not needed for white-box** on the existing `train` / `validation` trajectories: they are used as
+they are, and the spread of wordings helps a probe avoid learning one sentence. Report probe
+results per wording.
+
 ## Deviations
 
 - **2026-10-12, scripts moved:** `scripts/analyze_run.py` is now `scripts/secret_file/analyze.py`,
