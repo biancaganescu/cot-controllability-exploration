@@ -20,3 +20,12 @@ small → main. Frozen at tag `experiment-v2` before `main`. **Closed:** A1 not 
 Code: environments `src/cot_controllability/environments.py`, dataset
 `scripts/secret_file/datasets/v2.py`, analysis `scripts/secret_file/analysis/v2.py`, stage runner
 `infra/run_stage.sh`.
+
+Regenerate every stage's figures:
+
+```bash
+O=outputs/qwen3.6-27b/v2; P="uv run --group plots python scripts/secret_file/plots/v2.py"
+$P $O/smoke --check $O/smoke-check --out docs/experiments/v2/figures/smoke
+$P $O/small $O/small-read_exact --check $O/small-check $O/small-read_exact-check --out docs/experiments/v2/figures/small
+$P $O/main --check $O/main-check --out docs/experiments/v2/figures/main
+```

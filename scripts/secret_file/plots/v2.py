@@ -6,7 +6,7 @@ leak rate), when the rule is stated relative to the leak, and partial reads. Rat
 a bootstrap over customers. Style and helpers are shared with plots/v1.py.
 
     uv run --group plots python scripts/secret_file/plots/v2.py outputs/qwen3.6-27b/v2/main \\
-        [--check outputs/qwen3.6-27b/v2/main-check] [--out docs/experiments/v2/figures]
+        [--check outputs/qwen3.6-27b/v2/main-check ...] [--out docs/experiments/v2/figures]
 """
 import argparse
 import sys
@@ -197,10 +197,12 @@ def contrasts(rows, out):
     plt.close(fig)
 
 
-def knows_vs_does(rows, check, out):
-    if not check:
+def knows_vs_does(rows, checks, out):
+    if not checks:
         return
-    summary = sf.summarize_check(check)['conditions']
+    summary = {}
+    for check in checks:  # several check directories (e.g. a stage and its read_exact run) are merged
+        summary.update(sf.summarize_check(check)['conditions'])
     present = [(label, c) for label, c in ROWS if c in summary and any(r['condition'] == c for r in rows)]
     fig, ax = plt.subplots(figsize=(6.4, 0.42 * len(present) + 1.5))
     for i, (_, c) in enumerate(present):
@@ -209,7 +211,10 @@ def knows_vs_does(rows, check, out):
         m, lo, hi = bootstrap([r for r in rows if r['condition'] == c], LEAK)
         ax.plot([100 * lo, 100 * hi], [i + 0.17] * 2, color=ORANGE, lw=1.6, solid_capstyle='round')
         ax.plot(100 * m, i + 0.17, 'o', ms=5, color=ORANGE)
-        ax.text(100 * lo - 1.5, i + 0.17, f'{100 * m:.0f}%', ha='right', va='center', fontsize=7.5, color=INK)
+        if lo < 0.08:  # too close to the axis for a label on the left: put it on the right
+            ax.text(100 * hi + 1.5, i + 0.17, f'{100 * m:.0f}%', ha='left', va='center', fontsize=7.5, color=INK)
+        else:
+            ax.text(100 * lo - 1.5, i + 0.17, f'{100 * m:.0f}%', ha='right', va='center', fontsize=7.5, color=INK)
         if parsed:
             says = k1.get('yes', 0) / parsed
             ax.plot(100 * says, i - 0.17, 'D', ms=5, color=AQUA)
@@ -278,7 +283,7 @@ def reading(rows, out):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('runs', nargs='+', help='v2 run directories (pooled)')
-    parser.add_argument('--check', help='manipulation-check directory of the same customers')
+    parser.add_argument('--check', nargs='*', default=[], help='manipulation-check directories of the same customers')
     parser.add_argument('--out', type=Path, default=Path('docs/experiments/v2/figures'))
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)

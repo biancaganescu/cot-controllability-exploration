@@ -100,6 +100,8 @@ would the partner learn it?", it said **yes in 141 of 141** answers.
 
 ![Rule before or after the leak](../figures/smoke/rule_timing.png)
 
+![Partial reads (read_limit in its first, generic wording)](../figures/smoke/reading.png)
+
 With 6 attempts per environment the per-environment bars are wide; the figures are for seeing the
 pattern, not for comparing environments.
 
