@@ -95,18 +95,18 @@ stating any), so a low share there does not mean the rule comes early.
 
 All from `scripts/secret_file/plots/v1.py` (`uv run --group plots python scripts/secret_file/plots/v1.py`).
 
-![Every condition by whether and when the rule is stated](../figures/decision_by_condition.png)
+![Every condition by whether and when the rule is stated](../figures/test/decision_by_condition.png)
 
-![Thinking length by condition](../figures/cot_length_by_condition.png)
+![Thinking length by condition](../figures/test/cot_length_by_condition.png)
 
 The instructed conditions think slightly longer (≈ 263–291 reasoning tokens vs 242–254 under none),
 and visible longer than private — so instructions do not work by cutting the thinking short.
 
-![Leak rate at matched thinking length](../figures/leak_vs_length.png)
+![Leak rate at matched thinking length](../figures/test/leak_vs_length.png)
 
 ### Wording matters, for intrinsic and for instructed
 
-![Leak rate for every wording](../figures/leak_by_wording.png)
+![Leak rate for every wording](../figures/test/leak_by_wording.png)
 
 Each customer gets one of the six wordings of each sentence, so a row is a group of customers; under
 none those groups leak alike (95–98%), so the differences come from the wording.

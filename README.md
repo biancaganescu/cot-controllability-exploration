@@ -62,7 +62,7 @@ Qwen3.6-27B.
 
 ## What we found (Qwen3.6-27B, held-out `test`, 320 attempts per condition)
 
-![How often the model leaks the key, by condition](docs/experiments/v1/figures/leak_by_condition.png)
+![How often the model leaks the key, by condition](docs/experiments/v1/figures/test/leak_by_condition.png)
 
 Accuracy is 100% in every condition (guessing: 50%), so no condition costs the task. All findings
 below first appeared on `validation` and held on new customers and new wording.
@@ -72,7 +72,7 @@ below first appeared on `validation` and held on new customers and new wording.
    on the wording for both — one instructed sentence leaks 26%, another 58%. Bianca also found
    intrinsic weak on Kimi K3 (78% vs 83%).
 
-   ![Leak rate for every wording](docs/experiments/v1/figures/leak_by_wording.png)
+   ![Leak rate for every wording](docs/experiments/v1/figures/test/leak_by_wording.png)
 
 2. **Visible helps only once the model is told something.** Under the instructed conditions,
    visible leaks 12 points less than private (intrinsic: 11 points on `test`, none on
@@ -81,7 +81,7 @@ below first appeared on `validation` and held on new customers and new wording.
    it does so *after* the leak (Bianca's Kimi K3: 87%); under instructed, 21–26%. Intrinsic also
    states a rule less often (17–68% of attempts vs 77–90%), so its bars rest on fewer attempts.
 
-   ![When the rule is stated, relative to the leak](docs/experiments/v1/figures/rule_timing.png)
+   ![When the rule is stated, relative to the leak](docs/experiments/v1/figures/test/rule_timing.png)
 
 4. **It guards its reply, not its thinking.** The rules it states are about its reply ("I must not
    share the API key") or reply and thinking together — never about its thinking alone.

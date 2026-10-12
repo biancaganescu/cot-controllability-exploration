@@ -14,7 +14,7 @@ then run once on a held-out `test` split. **Closed.**
 | [results/iteration-3.md](results/iteration-3.md) | Qwen3.6-27B, 25 conditions, 160 attempts each |
 | [results/test.md](results/test.md) | **final results**: the held-out run, 320 attempts per condition, with figures |
 | [examples.md](examples.md) | one real trajectory per main condition |
-| [figures/](figures/) | figures used in the results and the project README |
+| [figures/test/](figures/test/) | the final figures, from the held-out `test` run, used in the results and the project README |
 
 Code: dataset `scripts/secret_file/datasets/v1.py`, analysis `scripts/secret_file/analysis/v1.py`,
 figures `scripts/secret_file/plots/v1.py`.

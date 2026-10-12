@@ -12,7 +12,7 @@ and `--help`; run from the repo root. The task runners themselves are entry poin
 | `analysis/v1.py` | v1's pre-registered analysis (frozen at `experiment-v1`): rates, H1–H4, P1–P3, manipulation check | once per finished v1 run | report on stdout (`logs/analyze-test.txt` for `test`) |
 | `analysis/v2.py` | v2's pre-registered analysis (A1–A3) | once per finished v2 run | report on stdout |
 | `plots/v2.py` | the v2 figures, per environment: leaks, A1/A2 contrasts, knows vs does, rule timing, reading | after a v2 run | `docs/experiments/v2/figures/*.png` |
-| `plots/v1.py` | the v1 result figures and the "rule only after the leak" table (descriptive) | after a run, to refresh the docs | `docs/experiments/v1/figures/*.png` |
+| `plots/v1.py` | the v1 result figures and the "rule only after the leak" table (descriptive) | after a run, to refresh the docs | `docs/experiments/v1/figures/test/*.png` |
 | `build_golden_positives.py` | one-off: the judge's golden set of positives (observer, eval awareness) | only to rebuild that file | `data/golden/observer-eval-positives.jsonl.gz` |
 
 The `secret_token` demo has no scripts.
