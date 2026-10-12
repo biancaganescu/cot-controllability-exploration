@@ -42,6 +42,7 @@ Exact wordings and every other term: [terminology](docs/terminology.md). Three r
 | [2](docs/experiments/v1/results/iteration-2.md) | instructed + salient on 8B; first Qwen3.6-27B run; scoring checked against 70 hand-labelled trajectories | done |
 | [3](docs/experiments/v1/results/iteration-3.md) | Qwen3.6-27B, 25 conditions, 160 attempts each; predictions P1–P3 | done |
 | [test](docs/experiments/v1/results/test.md) | plan frozen (`experiment-v1`); held-out run, 320 attempts per condition | **done** |
+| v2 ([plan](docs/experiments/v2/plan.md)) | A1–A3: channel named or not, reason vs order, read only what you need; 4 environments. [smoke](docs/experiments/v2/results/smoke.md) done, small → main next | in progress |
 
 ### White-box: what happens inside the model — next
 
