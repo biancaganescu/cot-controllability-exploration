@@ -78,7 +78,7 @@ below first appeared on `validation` and held on new customers and new wording.
    it does so *after* the leak (Bianca's Kimi K3: 87%); under instructed, 21–26%. Intrinsic also
    states a rule less often (17–68% of attempts vs 77–90%), so its bars rest on fewer attempts.
 
-   ![When the rule is stated, relative to the leak](docs/figures/decision_timing.png)
+   ![When the rule is stated, relative to the leak](docs/figures/rule_timing.png)
 
 4. **It guards its reply, not its thinking.** The rules it states are about its reply ("I must not
    share the API key") or reply and thinking together — never about its thinking alone.

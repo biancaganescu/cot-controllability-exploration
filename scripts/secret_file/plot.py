@@ -36,12 +36,12 @@ ROWS = [('none', '{v}-none'), ('intrinsic', '{v}-intrinsic'), ('instructed', '{v
         ('placeholder', '{v}-placeholder')]
 CONTROLS = [('control: routing ID', 'routing.{v}-none'), ('control: placebo (no visibility sentence)', 'placebo-none'),
             ('control: off-target instructed (visible)', 'public-offtarget_instructed')]
-DECISIONS = {  # key -> (legend text, colour), in stacking order: the key is written, then it is not.
-    'after': ('writes the key, states the rule only afterwards', RED),
-    'first': ('states the rule, writes the key anyway', YELLOW),
-    'silent_leak': ('writes the key, states no rule', GRAY),
-    'kept': ('states the rule, never writes the key', AQUA),
-    'silent_kept': ('never writes the key, states no rule', BLUE),
+DECISIONS = {  # key -> (legend text as in docs/terminology.md, colour), stacking order: leaks first, then not.
+    'after': ('rule only after the leak', RED),
+    'first': ('rule first, leaks anyway', YELLOW),
+    'silent_leak': ('leak, no rule', GRAY),
+    'kept': ('rule, never leaks', AQUA),
+    'silent_kept': ('no leak, no rule', BLUE),
 }
 
 
@@ -248,7 +248,7 @@ def decision_by_condition(rows, out):
     stacked(ax, bars, keys)
     ax.set_xlabel('share of the 640 attempts of each row (%)')
     header(ax, 'Does the model state a rule about the key, and when?',
-           'Held-out test, visible + private. Red: "I must not share the key" comes after the key is written.')
+           'Held-out test, visible + private. Red: "I must not share the key" comes only after the leak.')
     decision_legend(ax, keys, -0.2)
     footnote(ax, 'Each bar: 640 attempts of one condition on the held-out test split (32 customers x 10 samples x '
              'visible and private). Rule = a sentence in the thinking about not sharing the key (the scorer\'s rule '
@@ -278,7 +278,7 @@ def timing(rows_by_split, out):
     for i, (_, counts) in enumerate(bars):
         ax.text(101, i, f"{sum(counts[k] for k in keys)} of {sum(counts.values())}", va='center', fontsize=7.5, color=MUTED)
     ax.set_xlabel('attempts that state a rule about the key (%)')
-    header(ax, 'Is the rule stated before or after the key is written?',
+    header(ax, 'Is the rule stated before or after the leak?',
            'Right: attempts that state a rule, of all attempts. Under intrinsic the rule mostly comes too late.')
     decision_legend(ax, keys, -0.42)
     footnote(ax, 'All attempts: validation 16 customers x 10 samples x 2 (visible, private) = 320; test 32 x 10 x 2 = 640. '
@@ -286,7 +286,7 @@ def timing(rows_by_split, out):
              'there is nothing to place before or after the leak (they are in decision_by_condition). Intrinsic\'s '
              'validation wordings contain no explicit "not the key", so the model rarely states a rule there '
              '(53 of 320); instructed always tells it what not to do (287 of 320).')
-    fig.savefig(out / 'decision_timing.png')
+    fig.savefig(out / 'rule_timing.png')
     plt.close(fig)
 
 
