@@ -24,20 +24,20 @@ cloud storage, payments and a CRM.
 Each condition is **visible** (the partner reads the thinking) or **private** (nobody does); v2 uses
 visible only. On top of that the model is told: **none** · **intrinsic** (why the key matters, no
 rule) · **intrinsic + channel** (plus "anything you write in your reasoning is read by the partner")
-· **instructed + no channel** ("do not share the API key with the partner") · **instructed** (the
-same plus "in your reasoning or in your replies") · **read_limit** / **read_exact** (read less / read
+· **instructed** ("do not share the API key with the partner") · **instructed + channel** (the
+same plus "in your reasoning or in your replies"; v1's instructed is of this kind) · **read_limit** / **read_exact** (read less / read
 only the first 4 characters). v1 also had salient, reminder, reasoning-only, placeholder and
 controls. Exact wordings and every other term: [terminology](docs/terminology.md); real attempts:
 [v1 examples](docs/experiments/v1/examples.md), [v2 examples](docs/experiments/v2/examples.md).
 
 ## Where we are
 
-**Black-box: done.** Both versions were pre-registered, frozen and run once on fresh customers.
+**Black-box: done.** Both versions ran on customers not used while designing them.
 
 | Version | What | Status |
 | --- | --- | --- |
-| [v1](docs/experiments/v1/README.md) | one environment, 25 conditions (visible / private × none / intrinsic / instructed and variants); held-out `test`, 320 attempts per condition | **closed** (`experiment-v1`) |
-| [v2](docs/experiments/v2/README.md) | four environments, 7 visible conditions; A1–A3: does naming the reasoning matter for an instruction, for a reason, and does "read less" work; `main`, 240 attempts per condition | **closed** (`experiment-v2`) |
+| [v1](docs/experiments/v1/README.md) | one environment, 25 conditions (visible / private × none / intrinsic / instructed and variants); held-out `test`, 320 attempts per condition | **closed** |
+| [v2](docs/experiments/v2/README.md) | four environments, 7 visible conditions; A1–A3: does naming the reasoning matter for an instruction, for a reason, and does "read less" work; `main`, 240 attempts per condition | **closed** |
 
 **White-box: next** — see [Next](#next).
 
@@ -53,10 +53,10 @@ controls. Exact wordings and every other term: [terminology](docs/terminology.md
    your reasoning is read by the partner" cuts leaks to 71% (−24 points, 95% CI −32 to −15;
    predicted −10 to −15). It is also the only condition where the model often states a rule about
    its *thinking* (111 of 240 attempts). Three of four environments; cloud barely moves.
-3. **An instruction does not need the channel named.** "Do not share the API key with the partner"
-   leaks as much as the version that adds "in your reasoning or in your replies" (68% vs 65%; +3
-   points, CI −6 to +12; predicted +10 to +20). v1's instructed ≫ intrinsic gap was not about
-   naming the reasoning.
+3. **An instruction does not need the channel named.** Instructed ("do not share the API key with
+   the partner") leaks as much as instructed + channel, which adds "in your reasoning or in your
+   replies" (68% vs 65%; +3 points, CI −6 to +12; predicted +10 to +20). v1's instructed ≫
+   intrinsic gap was not about naming the reasoning.
 4. **It knows, and writes the key anyway.** Asked whether a key written in its reasoning would reach
    the partner, it says yes in 328 of 328 answers — and with a reason alone it still writes the key
    in 95% of attempts.

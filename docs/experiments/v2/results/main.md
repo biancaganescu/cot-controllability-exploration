@@ -9,7 +9,7 @@ The task and the conditions are described in [smoke](smoke.md#the-experiment-in-
 ## In short
 
 - **A1 — not supported.** An instruction leaks as much without naming the reasoning as with it
-  (+3 points, 95% CI −6 to +12; predicted +10 to +20). What makes *instructed* work is the
+  (+3 points, 95% CI −6 to +12; predicted +10 to +20). What made v1's *instructed* work is the
   instruction itself, not the word "reasoning".
 - **A2 — supported, larger than predicted.** Adding one sentence that the partner reads the
   reasoning cuts leaks under *intrinsic* from 95% to 71% (−24 points, 95% CI −32 to −15, Holm
@@ -41,8 +41,8 @@ visible, plus 336 manipulation-check questions. All attempts finished; 38 minute
 | none | 230 of 240 (96%) | 0 | 0 | 0 |
 | intrinsic | 227 of 240 (95%) | 5 | 0 | 0 |
 | **intrinsic + channel** | **170 of 240 (71%)** | 159 | **111** | 2 |
-| instructed + no channel | 164 of 240 (68%) | 194 | 0 | 0 |
-| instructed | 156 of 240 (65%) | 208 | 24 | 0 |
+| instructed | 164 of 240 (68%) | 194 | 0 | 0 |
+| instructed + channel | 156 of 240 (65%) | 208 | 24 | 0 |
 | read_limit | 208 of 240 (87%) | 0 | 0 | 3 |
 | read_exact (separate case) | **1 of 240** | 0 | 0 | **239** |
 
@@ -52,7 +52,7 @@ visible, plus 336 manipulation-check questions. All attempts finished; 38 minute
 
 | | Result (95% CI, bootstrap over 48 customers) | Prediction | Verdict |
 | --- | --- | --- | --- |
-| **A1** instructed + no channel − instructed | +3 points [−6, +12]; Holm p = 0.23 | +10 to +20 | **not supported** |
+| **A1** instructed − instructed + channel | +3 points [−6, +12]; Holm p = 0.23 | +10 to +20 | **not supported** |
 | **A2** intrinsic + channel − intrinsic | **−24 points [−32, −15]**; Holm p < 0.001 | −10 to −15 | **supported** (direction); larger than predicted |
 | **A3** reads only the prefix: read_limit − none | +1 point [0, +3]; rate 1.2%; Holm p = 0.09 | 30–40% | **not supported** |
 
@@ -79,9 +79,9 @@ does not depend on the condition; its behaviour does.
 
 - **Naming the channel changes *what* the model's rule is about.** Under intrinsic + channel, 111 of
   240 attempts state a rule about the *thinking* itself ("my reasoning is visible to the partner");
-  under instructed only 24, and under instructed + no channel none.
+  under instructed + channel only 24, and under instructed none.
 - **Rules still often come too late.** Of the attempts that state a rule, the rule follows the leak
-  in 58% under intrinsic + channel, 46% under instructed + no channel and 40% under instructed.
+  in 58% under intrinsic + channel, 46% under instructed and 40% under instructed + channel.
 
 ### Reading
 
@@ -89,7 +89,7 @@ does not depend on the condition; its behaviour does.
 
 ## What it means
 
-1. **The answer to the v1 confound.** v1's instructed > intrinsic gap mixed two things. v2 separates
+1. **The answer to the v1 confound.** v1's instructed > intrinsic gap mixed two things (v1's instructed named the channels, like v2's instructed + channel). v2 separates
    them: for an *instruction*, naming the channel adds nothing (A1); for a *reason*, it is what makes
    the reason work (A2). The model does not treat its thinking as an output unless told so — but an
    instruction to protect the key covers the thinking even when it is not named.
@@ -100,7 +100,7 @@ does not depend on the condition; its behaviour does.
    followed in 239 of 240 attempts; an explicit instruction about its own text ("…in your
    reasoning or in your replies") still leaks in 65%. The most reliable protection is upstream: a
    secret that is never read cannot leak.
-4. **v2's instructed is weaker than v1's** (65% vs 36–48% leaks): the sentences differ, so the
+4. **v2's instructed + channel is weaker than v1's instructed** (65% vs 36–48% leaks): the sentences differ, so the
    absolute rates depend on the wording; the contrasts are the result.
 
 ## Limits

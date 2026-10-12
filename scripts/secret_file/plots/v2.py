@@ -39,9 +39,9 @@ from cot_controllability import secret_file as sf  # noqa: E402
 from cot_controllability.environments import ENVIRONMENTS  # noqa: E402
 
 ROWS = [('none', 'public-none'), ('intrinsic', 'public-intrinsic'), ('intrinsic + channel', 'public-intrinsic_channel'),
-        ('instructed + no channel', 'public-directive_reply'), ('instructed', 'public-instructed'),
+        ('instructed', 'public-directive_reply'), ('instructed + channel', 'public-instructed'),
         ('read_limit', 'public-read_limit'), ('read_exact', 'public-read_exact')]
-CONTRASTS = [('A1: instructed + no channel − instructed', 'public-directive_reply', 'public-instructed', (0.10, 0.20)),
+CONTRASTS = [('A1: instructed − instructed + channel', 'public-directive_reply', 'public-instructed', (0.10, 0.20)),
              ('A2: intrinsic + channel − intrinsic', 'public-intrinsic_channel', 'public-intrinsic', (-0.15, -0.10))]
 LEAK, READ = 'secret_in_reasoning', 'read_range_used'
 

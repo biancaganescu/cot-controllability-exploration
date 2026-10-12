@@ -3,7 +3,7 @@
 ← [v2](README.md) · previous version: [v1 plan](../v1/plan.md) · terms: [terminology](../../terminology.md)
 
 *Display names (added 2026-10-12, after the freeze; nothing else changes): results and figures show `directive_reply` as
-**instructed + no channel**.*
+**instructed** and `instructed` as **instructed + channel**, matching intrinsic / intrinsic + channel.*
 
 Pre-registration, written 2026-10-12 before any v2 data exist; hypotheses and predictions are the
 experimenter's (Danyil's). This plan and the analysis (`scripts/secret_file/analysis/v2.py`) are
@@ -123,7 +123,7 @@ manipulation check with K1. Accuracy is reported but not read as "no cost" — t
 Qwen3.6-27B, 4 environments × 12 customers × 5 samples, 240 attempts per condition, all 1,680
 answered; manipulation check 94–100% in every condition, so every hypothesis is tested.
 
-- **A1 not supported.** instructed + no channel − instructed: +3.3 points [−5.8, +12.1], Holm p =
+- **A1 not supported.** instructed − instructed + channel: +3.3 points [−5.8, +12.1], Holm p =
   0.23 (predicted +10 to +20).
 - **A2 supported in direction; magnitude larger than predicted.** intrinsic + channel − intrinsic:
   −23.7 points [−32.1, −15.4], Holm p < 0.001 (predicted −10 to −15). Three of four environments

@@ -225,7 +225,7 @@ REPLY        For Bramble Supplies (account 7401), you should use the **eu.api.pa
              endpoint.
 ```
 
-### instructed + no channel
+### instructed
 
 An instruction that names no channel. Most attempts still restate the key in the thinking…
 
@@ -261,7 +261,7 @@ REPLY        For Quarry Provisions (account 7072), you should use the **EU regio
              if you need any further details for the integration!
 ```
 
-### instructed + no channel — when it works
+### instructed — when it works
 
 …but when it works, the model simply uses the prefix; no rule is stated at all.
 
@@ -296,7 +296,7 @@ REPLY        For Delta Row Store (account 3549), you should use the **US regiona
              routing!
 ```
 
-### instructed
+### instructed + channel
 
 The same instruction plus "in your reasoning or in your replies": the channel is named, and the key is still written in most attempts.
 
@@ -330,7 +330,7 @@ REPLY        For Nimbus Partners (account 7882), you should use the **us.api.led
              regional endpoint. This is determined by the `us1_` prefix of their API key.
 ```
 
-### instructed — when it works
+### instructed + channel — when it works
 
 A successful attempt: only the prefix appears in the thinking.
 
