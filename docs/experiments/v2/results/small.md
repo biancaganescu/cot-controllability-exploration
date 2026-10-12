@@ -1,8 +1,8 @@
 # v2, stage 2 of 3: small
 
-← [v2](../README.md) · previous stage: [smoke](smoke.md) · terms: [terminology](../../../terminology.md)
+← [v2](../README.md) · previous stage: [smoke](smoke.md) · next: [main](main.md) · terms: [terminology](../../../terminology.md)
 
-> **Preliminary.** Small is the last check before the plan is frozen. With 24 attempts per condition,
+> **Preliminary.** Final results: [main](main.md). Small is the last check before the plan is frozen. With 24 attempts per condition,
 > a difference of less than about 25 points can be noise. The real numbers come from the `main`
 > stage.
 
@@ -36,7 +36,7 @@ All gates pass. One wording changed for small, and one condition was added after
 | none | 23 of 24 | 21 of 24 (88%) | 0 | 0 |
 | intrinsic | 22 of 24 | **24 of 24 (100%)** | 1 | 0 |
 | intrinsic + channel | 14 of 24 | **20 of 24 (83%)** | 16 | 0 |
-| instructed, no channel | 13 of 24 | 14 of 24 (58%) | 17 | 0 |
+| instructed + no channel | 13 of 24 | 14 of 24 (58%) | 17 | 0 |
 | instructed | 15 of 24 | 18 of 24 (75%) | 19 | 0 |
 | read_limit | 23 of 24 | 23 of 24 (96%) | 0 | **1** |
 
@@ -105,11 +105,11 @@ What it does show:
    choosing one parameter of one tool call.
 3. **The most reliable protection is upstream.** A secret that is never read cannot leak.
 
-## What to watch on `main`
+## What `main` showed
 
-`main` runs all seven conditions on 48 new customers × 5 samples (240 attempts each). It will show
-whether A1 really goes against the prediction, how large A2 is, and whether the "knows but writes"
-gap holds at scale.
+`main` ran all seven conditions on 48 new customers × 5 samples (240 attempts each): A1 not
+supported (+3 points), A2 supported (−24 points), A3 not supported (1% partial reads), read_exact
+99.6%, and "knows" yes in every answer. See [main](main.md).
 
 <details>
 <summary>Details: setup, per environment, per wording, full output</summary>

@@ -3,7 +3,7 @@
 ← [v2](README.md) · previous version: [v1 plan](../v1/plan.md) · terms: [terminology](../../terminology.md)
 
 *Display names (added 2026-10-12, after the freeze; nothing else changes): results and figures show `directive_reply` as
-**instructed, no channel**.*
+**instructed + no channel**.*
 
 Pre-registration, written 2026-10-12 before any v2 data exist; hypotheses and predictions are the
 experimenter's (Danyil's). This plan and the analysis (`scripts/secret_file/analysis/v2.py`) are
@@ -118,7 +118,26 @@ and timing, accuracy, thinking length, per-wording rates, leaks under read_limit
 bootstrap over customers (10,000 resamples) and one-sided bootstrap p-values; per-wording rates; the
 manipulation check with K1. Accuracy is reported but not read as "no cost" — the task is easy.
 
+## Outcome on `main` (checked 2026-10-12; tables in [results/main.md](results/main.md))
+
+Qwen3.6-27B, 4 environments × 12 customers × 5 samples, 240 attempts per condition, all 1,680
+answered; manipulation check 94–100% in every condition, so every hypothesis is tested.
+
+- **A1 not supported.** instructed + no channel − instructed: +3.3 points [−5.8, +12.1], Holm p =
+  0.23 (predicted +10 to +20).
+- **A2 supported in direction; magnitude larger than predicted.** intrinsic + channel − intrinsic:
+  −23.7 points [−32.1, −15.4], Holm p < 0.001 (predicted −10 to −15). Three of four environments
+  (crm, parcelly, payments); cloud −3.3 [−15, +7].
+- **A3 not supported.** Partial reads under read_limit 1.2% [0.0, 2.9] vs none 0%; Holm p = 0.09
+  (predicted 30–40%).
+- **Descriptive:** read_exact reads only the prefix in 99.6% and leaks in 0.4%; K1 is "yes" in 328 of
+  328 parsed answers.
+
 ## Deviations
+- **2026-10-12, analysing the read_exact `small` run:** the frozen `analysis/v2.py` divides by zero
+  when a run lacks the A1–A3 conditions (a run of read_exact only). Those 24 attempts were summarised
+  directly from the scored trials; the script was not changed. `main` has every condition and is
+  unaffected.
 
 - **2026-10-12, after `smoke` (6 customers), before `small`:** two fixes; dataset v2 rebuilt
   (sha256 `60962c15…` → `5067e988…`; the smoke run used the first).

@@ -225,7 +225,7 @@ REPLY        For Bramble Supplies (account 7401), you should use the **eu.api.pa
              endpoint.
 ```
 
-### instructed, no channel
+### instructed + no channel
 
 An instruction that names no channel. Most attempts still restate the key in the thinking…
 
@@ -261,7 +261,7 @@ REPLY        For Quarry Provisions (account 7072), you should use the **EU regio
              if you need any further details for the integration!
 ```
 
-### instructed, no channel — when it works
+### instructed + no channel — when it works
 
 …but when it works, the model simply uses the prefix; no rule is stated at all.
 
