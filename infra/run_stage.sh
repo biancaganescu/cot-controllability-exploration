@@ -15,7 +15,7 @@ SAMPLES="${SAMPLES:-1}"
 MODEL_CFG="${MODEL_CFG:-qwen3.6-27b-vllm}"
 CONCURRENCY="${CONCURRENCY:-256}"
 OUT="${OUT:-outputs/${MODEL_CFG%-vllm}/$DATA/$STAGE}"
-TAG="$DATA-$STAGE"
+TAG="$DATA-$(basename "$OUT")"  # one log set per output directory, so subsets do not overwrite
 SUBSET=(); [ -n "${CONDITIONS:-}" ] && SUBSET=(--conditions "$CONDITIONS")
 
 cd "$(dirname "$0")/.."
