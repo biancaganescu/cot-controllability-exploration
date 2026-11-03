@@ -1,41 +1,27 @@
-"""Small OpenRouter token-routing demo. Only `run` submits inference."""
+"""Secret-token task (original demo): the token is given in the prompt. Only `run` submits inference."""
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
-import gzip
 import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import re
 import sys
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from datetime import datetime, timezone
+from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-DATA = ROOT / 'data' / 'demo.json.gz'
-API = 'https://openrouter.ai/api/v1/'
-CANARY = 'PRIVACY-DEMO-CANARY-DO-NOT-TRAIN-0f02b827-a60d-45dd-8451-93c63a585d48'
+from cot_controllability.common import (
+    CANARY,
+    DATA_DIR,
+    api_json,
+    check_endpoint,
+    read_data,
+    reasoning_variants,
+    save,
+)
 
-
-def read_data(path):
-    value = json.loads(gzip.decompress(Path(path).read_bytes()))
-    if value.get('canary') != CANARY:
-        raise ValueError('Missing demo canary')
-    return value
-
-
-def save(path, value):
-    path = Path(path)
-    payload = gzip.compress(json.dumps({'canary': CANARY, **value},
-                                      ensure_ascii=False).encode(), mtime=0)
-    temporary = path.with_name(path.name + '.pending')
-    with open(temporary, 'xb') as stream:
-        os.chmod(temporary, 0o600)
-        stream.write(payload)
-    temporary.replace(path)
+DATA = DATA_DIR / 'secret_token.json.gz'
 
 
 def load_demo():
@@ -109,19 +95,7 @@ def score_response(raw, case, profile):
     message = message if isinstance(message, dict) else {}
     bound = (raw.get('model') in (profile['model'], profile['canonical_slug'])
              and raw.get('provider') == profile['provider_name'])
-    variants = {key: message[key] for key in ('reasoning', 'reasoning_content')
-                if isinstance(message.get(key), str) and message[key].strip()}
-    details = message.get('reasoning_details')
-    opaque = details is not None and not isinstance(details, list)
-    if isinstance(details, list):
-        chunks = []
-        for block in details:
-            if isinstance(block, dict) and block.get('type') == 'reasoning.text' and isinstance(block.get('text'), str):
-                chunks.append(block['text'])
-            else:
-                opaque = True  # Summaries/encrypted blocks are not full traces.
-        if ''.join(chunks).strip():
-            variants['reasoning_details'] = ''.join(chunks)
+    variants, opaque = reasoning_variants(message)
     text = next(iter(variants.values()), '')
     content = message.get('content')
     valid_content = isinstance(content, str)
@@ -183,46 +157,9 @@ def summarize(rows, planned):
     return result
 
 
-def api_json(path, body=None, key=None):
-    headers = {'Content-Type': 'application/json'}
-    if key:
-        headers['Authorization'] = 'Bearer ' + key
-    request = Request(API + path, headers=headers,
-                      data=json.dumps(body).encode() if body is not None else None)
-    try:
-        with urlopen(request, timeout=300) as response:
-            return json.load(response)
-    except HTTPError as error:
-        # Do not echo response bodies: an upstream error might contain secrets.
-        raise RuntimeError('OpenRouter HTTP ' + str(error.code) + '; no automatic retry') from None
-    except (URLError, TimeoutError, ValueError):
-        raise RuntimeError('OpenRouter response unavailable; no automatic retry') from None
-
-
 def preflight(data, cases):
     profile = data['model_profile']
-    catalog = api_json('models')['data']
-    model = next((m for m in catalog if m['id'] == profile['model']), None)
-    endpoints = api_json('models/' + profile['model'] + '/endpoints')['data']['endpoints']
-    endpoint = next((e for e in endpoints if e.get('tag') == profile['provider_tag']), None)
-    if (model is None or endpoint is None or model.get('canonical_slug') != profile['canonical_slug']
-            or endpoint.get('provider_name') != profile['provider_name'] or endpoint.get('status') != 0
-            or endpoint.get('quantization') != profile['quantisation']):
-        raise ValueError('Pinned model/provider unavailable or changed; no fallback')
-    efforts = model.get('reasoning', {}).get('supported_efforts', [])
-    required = {'reasoning', 'reasoning_effort', 'max_tokens'}
-    if ((efforts is not None and profile['effort'] not in efforts)
-            or not required.issubset(endpoint.get('supported_parameters', []))
-            or (endpoint.get('max_completion_tokens') or profile['max_tokens']) < profile['max_tokens']):
-        raise ValueError('Pinned reasoning settings unavailable')
-    pricing = endpoint['pricing']
-    prices = [float(pricing[k]) for k in ('prompt', 'completion')]
-    if any(not math.isfinite(p) or p < 0 for p in prices):
-        raise ValueError('Invalid advertised prices')
-    # This demo has no tools/images/search. Fail if extra charges are advertised.
-    if any(float(v) != 0 for k, v in pricing.items()
-           if k not in {'prompt', 'completion', 'input_cache_read', 'input_cache_write', 'discount'}):
-        raise ValueError('Additional pricing fields need review')
+    model, endpoint, prices = check_endpoint(profile, {'reasoning', 'reasoning_effort', 'max_tokens'})
     estimate = sum((len(request_for(data, c)['messages'][0]['content'].encode()) + 1024) * prices[0]
                    + profile['max_tokens'] * prices[1] for c in cases)
     return {'model': model, 'endpoint': endpoint, 'estimated_max_usd': estimate,

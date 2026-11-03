@@ -1,0 +1,4 @@
+# Primary judge: small, not the newest, follows JSON well; cheap enough to label every trial.
+model: openai/gpt-4.1-mini
+temperature: 0
+max_tokens: 600

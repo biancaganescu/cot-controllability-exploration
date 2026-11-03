@@ -1,0 +1,54 @@
+[project]
+name = "cot-controllability"
+version = "0.1.0"
+description = "Pilot: can a reasoning model keep a private token out of its visible CoT?"
+readme = "README.md"
+requires-python = ">=3.10"
+# Runner and scorer are stdlib-only by design; add runtime deps here when needed.
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.9",
+]
+plots = [
+    "matplotlib>=3.10.9",
+]
+# White-box: replay trajectories through HF transformers (GPU box for the 27B model; the tokenizer alone runs anywhere).
+whitebox = [
+    "torch>=2.6",
+    "transformers>=4.57",
+    "accelerate>=1.2",  # device_map="auto" when loading the model
+    "safetensors>=0.5",
+    "scikit-learn>=1.6",
+    "jlens @ git+https://github.com/anthropics/jacobian-lens",
+]
+
+[project.scripts]
+cot-secret-token = "cot_controllability.blackbox.secret_token:main"
+cot-secret-file = "cot_controllability.blackbox.secret_file:main"
+cot-unpack = "cot_controllability.common:main"
+cot-judge = "cot_controllability.judge:main"
+cot-label = "cot_controllability.label:main"
+cot-whitebox = "cot_controllability.whitebox.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cot_controllability"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

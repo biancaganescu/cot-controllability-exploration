@@ -1,0 +1,15 @@
+# Qwen3.6-27B on our own GPU: `MODEL=Qwen/Qwen3.6-27B bash infra/serve_vllm.sh` (qwen3_coder parser).
+# Sampling = the model card's thinking-mode recommendation for general tasks.
+backend: vllm
+model: Qwen/Qwen3.6-27B
+max_tokens: 8192
+sampling:
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 20
+  min_p: 0.0
+  presence_penalty: 0.0
+options:
+  base_url: http://localhost:8000/v1/  # override with VLLM_BASE_URL, e.g. over an SSH tunnel
+  chat_template_kwargs:
+    enable_thinking: true
